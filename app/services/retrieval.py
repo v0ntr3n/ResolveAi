@@ -80,12 +80,8 @@ class PolicyRetriever:
         index_path = Path(self.settings.VECTOR_INDEX_DIR)
         index_path.mkdir(parents=True, exist_ok=True)
         
-        # Initialize embeddings model
-        if self.settings.DEEPSEEK_API_KEY:
-            self.embeddings_model = OpenAIEmbeddings(
-                model="text-embedding-ada-002",
-                api_key=self.settings.DEEPSEEK_API_KEY,
-            )
+        # Initialize embeddings model - supports llama.cpp server
+        self.embeddings_model = self._get_embeddings_model()
         
         # Try to load existing index
         faiss_path = index_path / "policy_index.faiss"
@@ -103,6 +99,43 @@ class PolicyRetriever:
         # Build new index
         self._build_index()
         self._initialized = True
+    
+    def _get_embeddings_model(self):
+        """Get embeddings model - supports llama.cpp server or OpenAI-compatible APIs.
+        
+        Configuration options:
+        1. EMBEDDING_API_BASE + EMBEDDING_API_KEY: Use llama.cpp server or other OpenAI-compatible API
+        2. DEEPSEEK_API_KEY: Use DeepSeek API with embeddings
+        3. OPENAI_API_KEY: Use OpenAI embeddings
+        
+        Example llama.cpp server setup:
+            ./llama-server -m embeddings.gguf --port 8080 --embeddings
+            EMBEDDING_API_BASE=http://localhost:8080/v1
+        """
+        # Priority 1: Custom embedding API (llama.cpp server or other OpenAI-compatible)
+        if self.settings.EMBEDDING_API_BASE:
+            return OpenAIEmbeddings(
+                model=self.settings.EMBEDDING_MODEL,
+                api_key=self.settings.EMBEDDING_API_KEY or "dummy-key",
+                base_url=self.settings.EMBEDDING_API_BASE,
+            )
+        
+        # Priority 2: DeepSeek API
+        if self.settings.DEEPSEEK_API_KEY:
+            return OpenAIEmbeddings(
+                model=self.settings.EMBEDDING_MODEL,
+                api_key=self.settings.DEEPSEEK_API_KEY,
+            )
+        
+        # Priority 3: OpenAI API
+        if self.settings.OPENAI_API_KEY:
+            return OpenAIEmbeddings(
+                model=self.settings.EMBEDDING_MODEL,
+                api_key=self.settings.OPENAI_API_KEY,
+            )
+        
+        # No embeddings available - will use keyword fallback
+        return None
     
     def _build_index(self):
         """Build FAISS index from policy documents."""

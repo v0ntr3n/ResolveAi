@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     AUTO_SEED_DATA: bool = True
     REFUND_APPROVAL_THRESHOLD: float = 50.0
     
+    # Embedding settings (supports llama.cpp server)
+    EMBEDDING_API_BASE: str = ""  # e.g., "http://localhost:8080/v1" for llama.cpp
+    EMBEDDING_MODEL: str = "text-embedding-ada-002"  # or local model name
+    EMBEDDING_API_KEY: str = ""  # Optional for local servers
+    
     # Week 3: LangSmith tracing
     LANGSMITH_API_KEY: str = ""
     LANGSMITH_PROJECT: str = "resolveai-production"

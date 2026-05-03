@@ -1,0 +1,116 @@
+{
+  "timestamp": "2026-05-03T21:52:09.416987+00:00",
+  "metrics": {
+    "faithfulness": 0.6434920634920636,
+    "answer_relevancy": NaN,
+    "context_precision": 0.0,
+    "context_recall": 0.03333333333333333,
+    "overall_score": NaN
+  },
+  "cases": [
+    {
+      "id": "eval-001",
+      "query": "What is your refund policy?",
+      "generated_answer": "Based on the policy context provided, here is the refund policy:\n\n- Orders marked as `delivered` can request a refund within 7 days of delivery.\n- Refund requests must include a valid reason such as `damaged`, `wrong_item`, `missing_items`, or `not_received`.\n- Orders already refunded cannot be refunded again.\n- Refunds above `50 USD` require human approval.\n- Refunds for damaged or wrong-item claims require supporting evidence such as a photo before review.\n- Orders flagged as medium or high risk are routed to human review even when the refund amount is low.\n- Digital goods and gift cards are not refundable in this demo policy.",
+      "retrieved_contexts": [
+        "# Return Policy\n\n## English\n\n- Orders marked as `delivered` can request a refund within 7 days of delivery.\n- Refund requests must include a valid reason such as `damaged`, `wrong_item`, `missing_items`, or `not_received`.\n- Orders already refunded cannot be refunded again.\n- Refunds above `50 USD` require human approval.\n- Refunds for damaged or wrong-item claims require supporting evidence such as a photo before review.\n- Orders flagged as medium or high risk are routed to human review even when the refund amount is low.\n- Digital goods and gift cards are not refundable in this demo policy.\n\n## Vietnamese\n\n- Các đơn hàng có trạng thái `delivered` có thể yêu cầu hoàn tiền trong vòng 7 ngày kể từ ngày giao hàng.\n- Yêu cầu hoàn tiền phải có lý do hợp lệ như `damaged`, `wrong_item`, `missing_items`, hoặc `not_received`.\n- Đơn hàng đã được hoàn tiền sẽ không thể hoàn tiền lần nữa.\n- Các yêu cầu hoàn tiền có giá trị trên `50 USD` phải được nhân viên phê duyệt.\n- Các yêu cầu do hàng hư hỏng hoặc giao sai cần có bằng chứng hỗ trợ như ảnh chụp trước khi xem xét.\n- Các đơn hàng bị gắn cờ rủi ro ở mức trung bình hoặc cao sẽ được chuyển cho nhân viên xem xét ngay cả khi giá trị hoàn tiền thấp.\n- Hàng hóa kỹ thuật số và thẻ quà tặng không được hoàn tiền trong chính sách demo này.\n"
+      ],
+      "expected_answer": "Refunds are available within 7 days of purchase for unused items in original packaging. Refunds after 7 days require manager approval.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-002",
+      "query": "How long does shipping take?",
+      "generated_answer": "Based on the policy context provided, I cannot give a specific shipping time estimate. The policy only states that orders may remain in \"processing\" status for up to 2 business days before handoff to a carrier, and that restricted-air items may take longer due to ground routing. However, it does not specify the total delivery time after handoff. Since the policy context is incomplete for answering your question, a human agent should review your request.",
+      "retrieved_contexts": [
+        "# Shipping Policy\n\n## English\n\n- Orders may remain in `processing` status for up to 2 business days before handoff to a carrier.\n- Tracking numbers appear after the order enters `shipped` status.\n- Delivery delays caused by weather or carrier backlog do not automatically qualify for refunds.\n- Customers should provide the order ID before a shipping investigation starts.\n- Some parcels require `special_handling` such as `fragile` packing or `restricted_air` transport.\n- Restricted-air items may take longer because they need ground routing instead of air transport.\n- Orders with unsupported or unusually risky shipping characteristics should be escalated for manual review.\n\n## Vietnamese\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n"
+      ],
+      "expected_answer": "Standard shipping takes 5-7 business days. Express shipping takes 2-3 business days. International shipping may take 10-14 business days.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-003",
+      "query": "Chính sách hoàn tiền là gì?",
+      "generated_answer": "Dựa trên chính sách hiện có, tôi không tìm thấy thông tin cụ thể về chính sách hoàn tiền. Nội dung chỉ đề cập đến các điều kiện không tự động đủ điều kiện hoàn tiền (như chậm giao do thời tiết hoặc đơn vị vận chuyển quá tải), nhưng không nêu rõ quy trình, tiêu chí hoặc cách thức hoàn tiền.\n\nVui lòng liên hệ với nhân viên hỗ trợ để được xem xét và giải đáp chi tiết hơn về chính sách này.",
+      "retrieved_contexts": [
+        "# Shipping Policy\n\n## English\n\n- Orders may remain in `processing` status for up to 2 business days before handoff to a carrier.\n- Tracking numbers appear after the order enters `shipped` status.\n- Delivery delays caused by weather or carrier backlog do not automatically qualify for refunds.\n- Customers should provide the order ID before a shipping investigation starts.\n- Some parcels require `special_handling` such as `fragile` packing or `restricted_air` transport.\n- Restricted-air items may take longer because they need ground routing instead of air transport.\n- Orders with unsupported or unusually risky shipping characteristics should be escalated for manual review.\n\n## Vietnamese\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n"
+      ],
+      "expected_answer": "Hoàn tiền trong vòng 7 ngày sau khi mua cho các mặt hàng chưa sử dụng trong bao bì gốc. Hoàn tiền sau 7 ngày cần sự chấp thuận của quản lý.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-004",
+      "query": "Can I change my shipping address after ordering?",
+      "generated_answer": "Please provide both an order ID and a full replacement address.",
+      "retrieved_contexts": [],
+      "expected_answer": "Yes, you can change your shipping address before the order is shipped. Contact customer support or use the order tracking page to update your address.",
+      "intent": "address_change"
+    },
+    {
+      "id": "eval-005",
+      "query": "What happens if my order arrives damaged?",
+      "generated_answer": "Based on the policy context provided, I cannot give a complete answer about what happens if your order arrives damaged. The policy does not cover damaged items upon arrival. A human agent should review your request.",
+      "retrieved_contexts": [
+        "# Shipping Policy\n\n## English\n\n- Orders may remain in `processing` status for up to 2 business days before handoff to a carrier.\n- Tracking numbers appear after the order enters `shipped` status.\n- Delivery delays caused by weather or carrier backlog do not automatically qualify for refunds.\n- Customers should provide the order ID before a shipping investigation starts.\n- Some parcels require `special_handling` such as `fragile` packing or `restricted_air` transport.\n- Restricted-air items may take longer because they need ground routing instead of air transport.\n- Orders with unsupported or unusually risky shipping characteristics should be escalated for manual review.\n\n## Vietnamese\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n"
+      ],
+      "expected_answer": "If your order arrives damaged, you can request a refund or replacement. Photo evidence is required for damaged items. Contact customer support within 48 hours of delivery.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-006",
+      "query": "How do I track my order?",
+      "generated_answer": "Please provide a valid order ID.",
+      "retrieved_contexts": [],
+      "expected_answer": "You can track your order using the tracking number provided in your confirmation email. Visit our website and enter the tracking number to see the current status.",
+      "intent": "order_status"
+    },
+    {
+      "id": "eval-007",
+      "query": "What is your return policy for defective items?",
+      "generated_answer": "According to the policy, for defective items (such as those marked as \"damaged\" or \"wrong_item\"), you can request a refund within 7 days of delivery if the order is marked as \"delivered.\" The request must include a valid reason like \"damaged\" or \"wrong_item,\" and supporting evidence such as a photo is required before review. Refunds above 50 USD require human approval, and orders flagged as medium or high risk are also routed to human review. If the policy context is incomplete for your specific situation, a human agent should review the request.",
+      "retrieved_contexts": [
+        "# Return Policy\n\n## English\n\n- Orders marked as `delivered` can request a refund within 7 days of delivery.\n- Refund requests must include a valid reason such as `damaged`, `wrong_item`, `missing_items`, or `not_received`.\n- Orders already refunded cannot be refunded again.\n- Refunds above `50 USD` require human approval.\n- Refunds for damaged or wrong-item claims require supporting evidence such as a photo before review.\n- Orders flagged as medium or high risk are routed to human review even when the refund amount is low.\n- Digital goods and gift cards are not refundable in this demo policy.\n\n## Vietnamese\n\n- Các đơn hàng có trạng thái `delivered` có thể yêu cầu hoàn tiền trong vòng 7 ngày kể từ ngày giao hàng.\n- Yêu cầu hoàn tiền phải có lý do hợp lệ như `damaged`, `wrong_item`, `missing_items`, hoặc `not_received`.\n- Đơn hàng đã được hoàn tiền sẽ không thể hoàn tiền lần nữa.\n- Các yêu cầu hoàn tiền có giá trị trên `50 USD` phải được nhân viên phê duyệt.\n- Các yêu cầu do hàng hư hỏng hoặc giao sai cần có bằng chứng hỗ trợ như ảnh chụp trước khi xem xét.\n- Các đơn hàng bị gắn cờ rủi ro ở mức trung bình hoặc cao sẽ được chuyển cho nhân viên xem xét ngay cả khi giá trị hoàn tiền thấp.\n- Hàng hóa kỹ thuật số và thẻ quà tặng không được hoàn tiền trong chính sách demo này.\n"
+      ],
+      "expected_answer": "Defective items can be returned within 30 days for a full refund or replacement. Photo evidence of the defect is required. Contact customer support to initiate the return process.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-008",
+      "query": "Do you offer international shipping?",
+      "generated_answer": "Based on the provided policy context, there is no information about international shipping. A human agent should review your request.",
+      "retrieved_contexts": [
+        "# Shipping Policy\n\n## English\n\n- Orders may remain in `processing` status for up to 2 business days before handoff to a carrier.\n- Tracking numbers appear after the order enters `shipped` status.\n- Delivery delays caused by weather or carrier backlog do not automatically qualify for refunds.\n- Customers should provide the order ID before a shipping investigation starts.\n- Some parcels require `special_handling` such as `fragile` packing or `restricted_air` transport.\n- Restricted-air items may take longer because they need ground routing instead of air transport.\n- Orders with unsupported or unusually risky shipping characteristics should be escalated for manual review.\n\n## Vietnamese\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n"
+      ],
+      "expected_answer": "Yes, we offer international shipping to most countries. International shipping typically takes 10-14 business days. Additional customs fees may apply depending on your location.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-009",
+      "query": "Chính sách giao hàng như thế nào?",
+      "generated_answer": "Chính sách giao hàng của chúng tôi như sau:\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n\nNếu chính sách trên chưa đầy đủ thông tin bạn cần, vui lòng liên hệ để được nhân viên hỗ trợ xem xét thêm.",
+      "retrieved_contexts": [
+        "# Shipping Policy\n\n## English\n\n- Orders may remain in `processing` status for up to 2 business days before handoff to a carrier.\n- Tracking numbers appear after the order enters `shipped` status.\n- Delivery delays caused by weather or carrier backlog do not automatically qualify for refunds.\n- Customers should provide the order ID before a shipping investigation starts.\n- Some parcels require `special_handling` such as `fragile` packing or `restricted_air` transport.\n- Restricted-air items may take longer because they need ground routing instead of air transport.\n- Orders with unsupported or unusually risky shipping characteristics should be escalated for manual review.\n\n## Vietnamese\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n"
+      ],
+      "expected_answer": "Giao hàng tiêu chuẩn mất 5-7 ngày làm việc. Giao hàng nhanh mất 2-3 ngày làm việc. Giao hàng quốc tế có thể mất 10-14 ngày làm việc.",
+      "intent": "policy_question"
+    },
+    {
+      "id": "eval-010",
+      "query": "Can I cancel my order after placing it?",
+      "generated_answer": "Based solely on the provided policy context, I cannot confirm whether you can cancel your order after placing it. The policy does not include any information about order cancellation procedures or eligibility.\n\nA human agent should review your request.",
+      "retrieved_contexts": [
+        "# Shipping Policy\n\n## English\n\n- Orders may remain in `processing` status for up to 2 business days before handoff to a carrier.\n- Tracking numbers appear after the order enters `shipped` status.\n- Delivery delays caused by weather or carrier backlog do not automatically qualify for refunds.\n- Customers should provide the order ID before a shipping investigation starts.\n- Some parcels require `special_handling` such as `fragile` packing or `restricted_air` transport.\n- Restricted-air items may take longer because they need ground routing instead of air transport.\n- Orders with unsupported or unusually risky shipping characteristics should be escalated for manual review.\n\n## Vietnamese\n\n- Đơn hàng có thể ở trạng thái `processing` tối đa 2 ngày làm việc trước khi bàn giao cho đơn vị vận chuyển.\n- Mã vận đơn sẽ xuất hiện sau khi đơn hàng chuyển sang trạng thái `shipped`.\n- Chậm giao do thời tiết hoặc do đơn vị vận chuyển quá tải không tự động đủ điều kiện hoàn tiền.\n- Khách hàng cần cung cấp mã đơn hàng trước khi bắt đầu kiểm tra vận chuyển.\n- Một số bưu kiện cần `special_handling` như đóng gói `fragile` hoặc vận chuyển `restricted_air`.\n- Các mặt hàng bị hạn chế đường hàng không có thể giao chậm hơn vì phải chuyển bằng đường bộ.\n- Các đơn hàng có đặc điểm vận chuyển không được hỗ trợ hoặc có rủi ro cao nên được chuyển sang xem xét thủ công.\n"
+      ],
+      "expected_answer": "Orders can be cancelled within 1 hour of placement. After that, the order enters processing and cannot be cancelled. Contact customer support immediately if you need to cancel.",
+      "intent": "policy_question"
+    }
+  ],
+  "summary": {
+    "total_cases": 10,
+    "avg_faithfulness": 0.6434920634920636,
+    "avg_relevancy": NaN,
+    "avg_context_precision": 0.0,
+    "avg_context_recall": 0.03333333333333333,
+    "overall_score": NaN
+  }
+}
