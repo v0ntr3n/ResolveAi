@@ -1,5 +1,10 @@
 """RAGAS-based RAG evaluation for quality metrics."""
 
+from dotenv import load_dotenv
+
+# Load environment variables first
+load_dotenv()
+
 from ragas import evaluate
 from ragas.metrics import (
     faithfulness,
@@ -17,22 +22,41 @@ class RAGASEvaluator:
     """RAGAS-based RAG evaluation for measuring response quality."""
 
     def __init__(self):
-        """Initialize RAGAS evaluator with LLM and embeddings."""
+        """Initialize RAGAS evaluator with LLM and embeddings.
+        
+        Supports both OpenAI and DeepSeek APIs. DeepSeek is used if
+        DEEPSEEK_API_KEY is set, otherwise falls back to OpenAI.
+        """
         settings = get_settings()
 
-        if not settings.OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY required for RAGAS evaluation")
-
-        # Initialize LLM and embeddings for RAGAS
-        self.llm = ChatOpenAI(
-            model="gpt-4",
-            api_key=settings.OPENAI_API_KEY,
-        )
-
-        self.embeddings = OpenAIEmbeddings(
-            model="text-embedding-ada-002",
-            api_key=settings.OPENAI_API_KEY,
-        )
+        # Prefer DeepSeek if available, otherwise use OpenAI
+        if settings.DEEPSEEK_API_KEY:
+            # DeepSeek uses OpenAI-compatible API
+            self.llm = ChatOpenAI(
+                model="deepseek-chat",
+                api_key=settings.DEEPSEEK_API_KEY,
+                base_url="https://api.deepseek.com/v1",
+            )
+            # DeepSeek doesn't have embeddings, use OpenAI if available
+            if settings.OPENAI_API_KEY:
+                self.embeddings = OpenAIEmbeddings(
+                    model="text-embedding-3-small",
+                    api_key=settings.OPENAI_API_KEY,
+                )
+            else:
+                raise ValueError("OPENAI_API_KEY required for embeddings even with DeepSeek LLM")
+        elif settings.OPENAI_API_KEY:
+            # Use OpenAI for both LLM and embeddings
+            self.llm = ChatOpenAI(
+                model="gpt-4o-mini",
+                api_key=settings.OPENAI_API_KEY,
+            )
+            self.embeddings = OpenAIEmbeddings(
+                model="text-embedding-3-small",
+                api_key=settings.OPENAI_API_KEY,
+            )
+        else:
+            raise ValueError("Either DEEPSEEK_API_KEY or OPENAI_API_KEY required for RAGAS evaluation")
 
         # Define metrics to evaluate
         self.metrics = [
@@ -85,10 +109,23 @@ class RAGASEvaluator:
             embeddings=self.embeddings,
         )
 
+        # Handle RAGAS results - they may be lists or single values
+        def get_metric_value(results, key: str) -> float:
+            val = results[key]
+            if isinstance(val, list):
+                # Return average of list values
+                return sum(v for v in val if v is not None) / len([v for v in val if v is not None]) if val else 0.0
+            return float(val) if val is not None else 0.0
+
+        faithfulness = get_metric_value(results, "faithfulness")
+        answer_relevancy = get_metric_value(results, "answer_relevancy")
+        context_precision = get_metric_value(results, "context_precision")
+        context_recall = get_metric_value(results, "context_recall")
+
         return {
-            "faithfulness": float(results["faithfulness"]),
-            "answer_relevancy": float(results["answer_relevancy"]),
-            "context_precision": float(results["context_precision"]),
-            "context_recall": float(results["context_recall"]),
-            "overall_score": sum(results.values()) / len(results),
+            "faithfulness": faithfulness,
+            "answer_relevancy": answer_relevancy,
+            "context_precision": context_precision,
+            "context_recall": context_recall,
+            "overall_score": (faithfulness + answer_relevancy + context_precision + context_recall) / 4,
         }

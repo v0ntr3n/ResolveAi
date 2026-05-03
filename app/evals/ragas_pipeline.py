@@ -4,6 +4,11 @@ import json
 from datetime import datetime, UTC
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+# Load environment variables before importing config
+load_dotenv()
+
 from app.agent.graph import build_support_graph
 from app.data.db import get_session_factory
 from app.evals.ragas_eval import RAGASEvaluator
@@ -26,7 +31,7 @@ def run_ragas_evaluation(limit: int | None = None):
         print(f"ERROR: RAGAS test cases not found at {test_cases_path}")
         return None
 
-    with open(test_cases_path) as f:
+    with open(test_cases_path, encoding="utf-8") as f:
         test_cases = json.load(f)
 
     if limit:
@@ -42,7 +47,8 @@ def run_ragas_evaluation(limit: int | None = None):
     evaluation_cases = []
 
     for case in test_cases:
-        print(f"Processing test case {case['id']}: {case['query'][:50]}...")
+        query_preview = case['query'][:50].encode('ascii', 'replace').decode('ascii')
+        print(f"Processing test case {case['id']}: {query_preview}...")
 
         # Execute RAG pipeline
         with session_factory() as session:
@@ -91,8 +97,8 @@ def run_ragas_evaluation(limit: int | None = None):
     report_path = Path("data/evals/ragas_report.json")
     report_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(report_path, "w") as f:
-        json.dump(report, f, indent=2)
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2, ensure_ascii=False)
 
     print(f"\nEvaluation complete!")
     print(f"Overall Score: {metrics['overall_score']:.3f}")

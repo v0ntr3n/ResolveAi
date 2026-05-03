@@ -11,12 +11,54 @@ from app.core.config import get_settings
 
 
 KEYWORD_TO_FILE = {
+    # Return & Refund
     "refund": "return_policy.md",
     "return": "return_policy.md",
+    "money back": "return_policy.md",
+    "damaged": "return_policy.md",
+    "defective": "warranty_policy.md",
+    "warranty": "warranty_policy.md",
+    
+    # Shipping & Tracking
     "shipping": "shipping_policy.md",
     "track": "shipping_policy.md",
+    "delivery": "shipping_policy.md",
+    "out for delivery": "shipping_policy.md",
+    "shipped": "shipping_policy.md",
+    "international": "shipping_policy.md",
+    
+    # Address
     "address": "address_change_policy.md",
+    "shipping address": "address_change_policy.md",
+    "delivery address": "address_change_policy.md",
+    
+    # Cancellation
+    "cancel": "cancellation_policy.md",
+    "cancellation": "cancellation_policy.md",
+    
+    # Payment
+    "payment": "payment_policy.md",
+    "pay": "payment_policy.md",
+    "credit card": "payment_policy.md",
+    "paypal": "payment_policy.md",
+    "charge": "payment_policy.md",
+    
+    # Support
     "escalat": "escalation_policy.md",
+    "human": "support_policy.md",
+    "agent": "support_policy.md",
+    "support": "support_policy.md",
+    "contact": "support_policy.md",
+    "phone": "support_policy.md",
+    "email": "support_policy.md",
+    
+    # Vietnamese keywords
+    "hoàn tiền": "return_policy.md",
+    "địa chỉ": "address_change_policy.md",
+    "giao hàng": "shipping_policy.md",
+    "hủy": "cancellation_policy.md",
+    "thanh toán": "payment_policy.md",
+    "bảo hành": "warranty_policy.md",
 }
 
 
@@ -99,24 +141,70 @@ class PolicyRetriever:
         faiss.write_index(self.index, str(index_path / "policy_index.faiss"))
         (index_path / "policy_docs.pkl").write_bytes(pickle.dumps(documents))
     
-    def _split_into_chunks(self, text: str, chunk_size: int = 500) -> list[str]:
-        """Split text into smaller chunks for better retrieval."""
-        paragraphs = text.split("\n\n")
-        chunks = []
-        current_chunk = ""
+    def _split_into_chunks(self, text: str, chunk_size: int = 400, overlap: int = 100) -> list[str]:
+        """Split text into smaller chunks with overlap for better retrieval.
         
-        for para in paragraphs:
-            if len(current_chunk) + len(para) < chunk_size:
-                current_chunk += para + "\n\n"
+        Uses a sliding window approach with overlap to ensure context continuity.
+        Also extracts section headers for better context.
+        """
+        # First, extract section headers as separate chunks
+        sections = []
+        lines = text.split("\n")
+        current_section = ""
+        section_title = ""
+        
+        for line in lines:
+            # Detect markdown headers
+            if line.startswith("# ") or line.startswith("## ") or line.startswith("### "):
+                # Save previous section if exists
+                if current_section.strip():
+                    sections.append({
+                        "title": section_title,
+                        "content": current_section.strip(),
+                    })
+                section_title = line.replace("#", "").strip()
+                current_section = line + "\n"
             else:
-                if current_chunk.strip():
-                    chunks.append(current_chunk.strip())
-                current_chunk = para + "\n\n"
+                current_section += line + "\n"
         
-        if current_chunk.strip():
-            chunks.append(current_chunk.strip())
+        # Add final section
+        if current_section.strip():
+            sections.append({
+                "title": section_title,
+                "content": current_section.strip(),
+            })
         
-        return chunks if chunks else [text]
+        # Now create overlapping chunks from sections
+        chunks = []
+        all_text = "\n".join(s["content"] for s in sections)
+        
+        # Sliding window with overlap
+        start = 0
+        while start < len(all_text):
+            end = min(start + chunk_size, len(all_text))
+            chunk = all_text[start:end]
+            
+            # Try to find a good break point (newline)
+            if end < len(all_text):
+                last_newline = chunk.rfind("\n")
+                if last_newline > chunk_size - overlap:
+                    chunk = chunk[:last_newline]
+                    end = start + last_newline
+            
+            if chunk.strip():
+                chunks.append(chunk.strip())
+            
+            # Move start with overlap
+            start = end - overlap if end < len(all_text) else end
+        
+        # Also add section headers as separate small chunks for better retrieval
+        for section in sections:
+            if section["title"]:
+                title_chunk = f"{section['title']}\n{section['content'][:200]}"
+                if title_chunk.strip() and title_chunk not in chunks:
+                    chunks.insert(0, title_chunk)
+        
+        return chunks if chunks else [text[:chunk_size]]
     
     def search(self, query: str, k: int = 3) -> dict[str, str]:
         """Search for relevant policy content."""
