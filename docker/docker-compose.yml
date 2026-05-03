@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: resolveai-api
+    restart: unless-stopped
+    ports:
+      - "10000:10000"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - DATABASE_URL=sqlite:///./data/orders.db
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-resolveai-production}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PROMETHEUS_ENABLED=true
+    volumes:
+      - backend-data:/app/data
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - resolveai-network
+
+  # Streamlit UI Service
+  ui:
+    build:
+      context: ..
+      dockerfile: Dockerfile.ui
+    container_name: resolveai-ui
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - RESOLVEAI_BACKEND_URL=http://backend:10000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - resolveai-network
+
+volumes:
+  backend-data:
+    driver: local
+
+networks:
+  resolveai-network:
+    driver: bridge

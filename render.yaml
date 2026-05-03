@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: resolveai-api
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: uv sync --frozen --no-dev
+    startCommand: uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    autoDeployTrigger: commit
+    healthCheckPath: /health
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+      - key: DATABASE_URL
+        value: sqlite:///./data/orders.db
+      - key: VECTOR_INDEX_DIR
+        value: ./data/vector_index
+      - key: AUTO_SEED_DATA
+        value: "true"
+      - key: REFUND_APPROVAL_THRESHOLD
+        value: "50.0"
+
+  - type: web
+    name: resolveai-ui
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: uv sync --frozen --no-dev
+    startCommand: uv run streamlit run ui/app.py --server.address 0.0.0.0 --server.port $PORT
+    autoDeployTrigger: commit
+    envVars:
+      - key: RESOLVEAI_BACKEND_HOSTPORT
+        fromService:
+          name: resolveai-api
+          type: web
+          property: hostport

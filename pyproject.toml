@@ -1,0 +1,52 @@
+[project]
+name = "resolveai"
+version = "0.1.0"
+description = "Autonomous Tier-1 support agent with LangGraph, FastAPI, and Streamlit."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115.0,<1.0.0",
+    "uvicorn>=0.35.0,<1.0.0",
+    "streamlit>=1.45.0,<2.0.0",
+    "sqlalchemy>=2.0.40,<3.0.0",
+    "pydantic>=2.11.0,<3.0.0",
+    "pydantic-settings>=2.9.0,<3.0.0",
+    "langgraph>=0.4.0,<1.0.0",
+    "langchain>=0.3.25,<1.0.0",
+    "langchain-core>=0.3.60,<1.0.0",
+    "langchain-openai>=0.3.18,<1.0.0",
+    "faiss-cpu>=1.11.0,<2.0.0",
+    "faker>=37.1.0,<38.0.0",
+    "httpx>=0.28.1,<1.0.0",
+    "python-dotenv>=1.1.0,<2.0.0",
+    # Week 1: Async support
+    "aiosqlite>=0.20.0,<1.0.0",
+    # Week 3: Observability & Evaluation
+    "langsmith>=0.1.0,<1.0.0",
+    "ragas>=0.1.0,<1.0.0",
+    "datasets>=2.14.0,<3.0.0",
+    "prometheus-client>=0.19.0,<1.0.0",
+    "structlog>=24.1.0,<25.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5,<9.0.0",
+    "pytest-asyncio>=1.0.0,<2.0.0",
+    "pytest-cov>=6.1.1,<7.0.0",
+    "ruff>=0.11.8,<1.0.0",
+    # Week 2: Property-based testing
+    "hypothesis>=6.100.0,<7.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.setuptools]
+packages = ["app", "ui"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

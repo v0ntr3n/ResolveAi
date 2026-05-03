@@ -1,0 +1,67 @@
+from langchain_openai import ChatOpenAI
+from langsmith.run_helpers import traceable
+from pydantic import BaseModel
+
+from app.agent.prompts import build_policy_prompt, build_intent_classification_prompt
+
+
+class IntentClassification(BaseModel):
+    """Structured intent classification result."""
+    intent: str
+    confidence: float
+
+
+@traceable(name="llm_classification", run_type="llm")
+def classify_intent_with_llm(message: str, api_key: str) -> str:
+    """Use LLM for intelligent intent classification with LangSmith tracing."""
+    if not api_key:
+        return "policy_question"
+    
+    model = ChatOpenAI(
+        model="deepseek-chat",
+        api_key=api_key,
+        base_url="https://api.deepseek.com",
+        temperature=0,
+    )
+    
+    prompt = build_intent_classification_prompt(message)
+    response = model.invoke(prompt)
+    
+    # Parse response to extract intent
+    content = response.content if isinstance(response.content, str) else ""
+    
+    # Map LLM response to supported intents
+    intent_mapping = {
+        "order_status": ["order_status", "track", "where is", "vận đơn", "ở đâu"],
+        "refund": ["refund", "hoàn tiền", "return"],
+        "address_change": ["address", "địa chỉ", "change address"],
+        "policy_question": ["policy", "chính sách", "question"]
+    }
+    
+    content_lower = content.lower()
+    for intent, keywords in intent_mapping.items():
+        if any(keyword in content_lower for keyword in keywords):
+            return intent
+    
+    return "policy_question"
+
+
+@traceable(name="llm_policy_generation", run_type="llm")
+def generate_policy_answer(question: str, policy_context: str, language: str, api_key: str) -> str:
+    """Generate policy answer with LangSmith tracing."""
+    if not api_key:
+        return policy_context
+
+    try:
+        model = ChatOpenAI(
+            model="deepseek-chat",
+            api_key=api_key,
+            base_url="https://api.deepseek.com",
+            temperature=0,
+        )
+        prompt = build_policy_prompt(question, policy_context, language)
+        response = model.invoke(prompt)
+        return response.content if isinstance(response.content, str) else policy_context
+    except Exception:
+        # Fallback to raw policy context on any API error
+        return policy_context

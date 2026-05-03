@@ -1,0 +1,422 @@
+{
+  "description": "Test queries for ResolveAI customer support system",
+  "version": "2.0",
+  "cases": [
+    {
+      "id": "en-order-001",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "Where is my order ORD-000001?",
+      "category": "order_status",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-order-002",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "Track order ORD-000010 for me.",
+      "category": "order_status",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-order-003",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "Can you tell me the status of ORD-000025?",
+      "category": "order_status",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-order-004",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "I need to know where my package ORD-000050 is right now.",
+      "category": "order_status",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-order-005",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "Has my order ORD-000075 been shipped yet?",
+      "category": "order_status",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-order-006",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "When will ORD-000100 arrive at my house?",
+      "category": "order_status",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-order-001",
+      "language": "vi",
+      "expected_intent": "order_status",
+      "prompt": "Đơn ORD-000030 đang ở đâu?",
+      "category": "order_status",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-order-002",
+      "language": "vi",
+      "expected_intent": "order_status",
+      "prompt": "Kiểm tra vận đơn cho ORD-000041.",
+      "category": "order_status",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-order-003",
+      "language": "vi",
+      "expected_intent": "order_status",
+      "prompt": "Đơn hàng ORD-000060 của tôi đã giao chưa?",
+      "category": "order_status",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-order-004",
+      "language": "vi",
+      "expected_intent": "order_status",
+      "prompt": "Tôi muốn biết tình trạng đơn hàng ORD-000085.",
+      "category": "order_status",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-refund-001",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "Refund order ORD-000055 because it is damaged.",
+      "category": "refund",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-refund-002",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "Please refund ORD-000120.",
+      "category": "refund",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-refund-003",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "I want a refund for ORD-000245.",
+      "category": "refund",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-refund-004",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "The item I received is wrong, I need my money back for ORD-000070.",
+      "category": "refund",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-refund-005",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "My order ORD-000130 arrived with missing parts, can I get a refund?",
+      "category": "refund",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-refund-006",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "I never received my package ORD-000150 even though it says delivered. I want a refund.",
+      "category": "refund",
+      "difficulty": "hard"
+    },
+    {
+      "id": "en-refund-007",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "Can I return ORD-000200 and get my money back? The quality is poor.",
+      "category": "refund",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-refund-001",
+      "language": "vi",
+      "expected_intent": "refund",
+      "prompt": "Hoàn tiền cho đơn ORD-000055 vì hàng bị hỏng.",
+      "category": "refund",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-refund-002",
+      "language": "vi",
+      "expected_intent": "refund",
+      "prompt": "Tôi muốn hoàn tiền đơn ORD-000180.",
+      "category": "refund",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-refund-003",
+      "language": "vi",
+      "expected_intent": "refund",
+      "prompt": "Đơn hàng ORD-000110 của tôi bị thiếu đồ, tôi muốn hoàn tiền.",
+      "category": "refund",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-refund-004",
+      "language": "vi",
+      "expected_intent": "refund",
+      "prompt": "Tôi nhận sai hàng, xin hoàn tiền cho ORD-000095.",
+      "category": "refund",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-address-001",
+      "language": "en",
+      "expected_intent": "address_change",
+      "prompt": "Change shipping address for ORD-000001 to 456 New Street, Hanoi",
+      "category": "address_change",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-address-002",
+      "language": "en",
+      "expected_intent": "address_change",
+      "prompt": "Update the address for order ORD-000065 to 12 River Road, Da Nang",
+      "category": "address_change",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-address-003",
+      "language": "en",
+      "expected_intent": "address_change",
+      "prompt": "Address change for ORD-000200 to 5 Lake View, Hue",
+      "category": "address_change",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-address-004",
+      "language": "en",
+      "expected_intent": "address_change",
+      "prompt": "I moved to a new house. Can you ship ORD-000020 to 999 New Home Drive instead?",
+      "category": "address_change",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-address-005",
+      "language": "en",
+      "expected_intent": "address_change",
+      "prompt": "Please deliver my order ORD-000035 to my office at 100 Business Center, Floor 5.",
+      "category": "address_change",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-address-001",
+      "language": "vi",
+      "expected_intent": "address_change",
+      "prompt": "Đổi địa chỉ cho đơn ORD-000001 đến 789 Tran Hung Dao, Ha Noi",
+      "category": "address_change",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-address-002",
+      "language": "vi",
+      "expected_intent": "address_change",
+      "prompt": "Cập nhật địa chỉ cho đơn ORD-000090 đến 33 Nguyen Hue, HCM",
+      "category": "address_change",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-address-003",
+      "language": "vi",
+      "expected_intent": "address_change",
+      "prompt": "Tôi muốn giao đơn ORD-000015 đến địa chỉ công ty tại 55 Quang Trung.",
+      "category": "address_change",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-policy-001",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "What is the refund policy?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-policy-002",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "Tell me about shipping restrictions.",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-policy-003",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "What evidence do I need for a damaged item refund?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-policy-004",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "When does a human agent review a refund?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-policy-005",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "How many days do I have to request a refund after delivery?",
+      "category": "policy_question",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-policy-006",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "Can I change my shipping address after the order has been shipped?",
+      "category": "policy_question",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-policy-007",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "What items cannot be shipped by air?",
+      "category": "policy_question",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-policy-008",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "How long does the refund process take after approval?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-policy-001",
+      "language": "vi",
+      "expected_intent": "policy_question",
+      "prompt": "Chính sách hoàn tiền là gì?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-policy-002",
+      "language": "vi",
+      "expected_intent": "policy_question",
+      "prompt": "Chính sách đổi địa chỉ giao hàng như thế nào?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-policy-003",
+      "language": "vi",
+      "expected_intent": "policy_question",
+      "prompt": "Tôi cần bằng chứng gì để hoàn tiền vì hàng bị hỏng?",
+      "category": "policy_question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-policy-004",
+      "language": "vi",
+      "expected_intent": "policy_question",
+      "prompt": "Bao lâu thì tôi nhận được tiền sau khi hoàn tiền được duyệt?",
+      "category": "policy_question",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-policy-005",
+      "language": "vi",
+      "expected_intent": "policy_question",
+      "prompt": "Những mặt hàng nào không được vận chuyển bằng đường hàng không?",
+      "category": "policy_question",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-mixed-001",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "Refund ORD-000055 and tell me what proof you need.",
+      "category": "mixed",
+      "difficulty": "medium"
+    },
+    {
+      "id": "vi-mixed-001",
+      "language": "vi",
+      "expected_intent": "refund",
+      "prompt": "Hoàn tiền đơn ORD-000055 và cho tôi biết cần ảnh gì.",
+      "category": "mixed",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-demo-001",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "Where is my demo order DEMO-001?",
+      "category": "demo",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-demo-002",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "I want to refund DEMO-002 because the item arrived damaged.",
+      "category": "demo",
+      "difficulty": "medium"
+    },
+    {
+      "id": "en-demo-003",
+      "language": "en",
+      "expected_intent": "address_change",
+      "prompt": "Change address for DEMO-003 to 999 Updated Street, New City",
+      "category": "demo",
+      "difficulty": "easy"
+    },
+    {
+      "id": "vi-demo-001",
+      "language": "vi",
+      "expected_intent": "refund",
+      "prompt": "Hoàn tiền đơn DEMO-010 vì thiếu hàng.",
+      "category": "demo",
+      "difficulty": "easy"
+    },
+    {
+      "id": "en-edge-001",
+      "language": "en",
+      "expected_intent": "order_status",
+      "prompt": "ORD-999999",
+      "category": "edge_case",
+      "difficulty": "hard"
+    },
+    {
+      "id": "en-edge-002",
+      "language": "en",
+      "expected_intent": "policy_question",
+      "prompt": "Help",
+      "category": "edge_case",
+      "difficulty": "hard"
+    },
+    {
+      "id": "en-edge-003",
+      "language": "en",
+      "expected_intent": "refund",
+      "prompt": "I am very unhappy with my purchase ORD-000300 and want my money back immediately!",
+      "category": "edge_case",
+      "difficulty": "hard"
+    },
+    {
+      "id": "vi-edge-001",
+      "language": "vi",
+      "expected_intent": "order_status",
+      "prompt": "Đơn hàng của tôi đâu?",
+      "category": "edge_case",
+      "difficulty": "hard"
+    }
+  ]
+}

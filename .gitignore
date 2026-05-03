@@ -1,0 +1,105 @@
+# Python
+.venv/
+venv/
+.env
+.env.*
+docker/.env.docker
+*.env
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/orders.db
+
+# Vector Index (generated)
+data/vector_index/
+*.faiss
+
+# Logs
+*.log
+logs/
+docker/logs/
+docker/.env.docker
+
+# Streamlit
+.streamlit/
+
+# Playwright
+.playwright-mcp/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# Build artifacts
+uv.lock
+*.lock
+
+# Task files (development)
+roo_task_*.md
+
+# Egg info (build artifact)
+resolveai.egg-info/
+
+# Hypothesis cache
+.hypothesis/
+
+# Temporary directories
+123/
+tmp/
+temp/
