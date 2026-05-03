@@ -112,12 +112,14 @@ class PolicyRetriever:
             ./llama-server -m embeddings.gguf --port 8080 --embeddings
             EMBEDDING_API_BASE=http://localhost:8080/v1
         """
+        from app.services.embeddings import LlamaCppEmbeddings
+        
         # Priority 1: Custom embedding API (llama.cpp server or other OpenAI-compatible)
         if self.settings.EMBEDDING_API_BASE:
-            return OpenAIEmbeddings(
+            return LlamaCppEmbeddings(
+                base_url=self.settings.EMBEDDING_API_BASE,
                 model=self.settings.EMBEDDING_MODEL,
                 api_key=self.settings.EMBEDDING_API_KEY or "dummy-key",
-                base_url=self.settings.EMBEDDING_API_BASE,
             )
         
         # Priority 2: DeepSeek API

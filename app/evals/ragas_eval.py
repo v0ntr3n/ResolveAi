@@ -16,9 +16,10 @@ from datasets import Dataset
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from app.core.config import get_settings
+from app.services.embeddings import LlamaCppEmbeddings
 
 
-def _get_embeddings_model(settings) -> OpenAIEmbeddings:
+def _get_embeddings_model(settings):
     """Get embeddings model - supports llama.cpp server or OpenAI-compatible APIs.
     
     Priority:
@@ -28,10 +29,10 @@ def _get_embeddings_model(settings) -> OpenAIEmbeddings:
     """
     # Priority 1: Custom embedding API (llama.cpp server)
     if settings.EMBEDDING_API_BASE:
-        return OpenAIEmbeddings(
+        return LlamaCppEmbeddings(
+            base_url=settings.EMBEDDING_API_BASE,
             model=settings.EMBEDDING_MODEL,
             api_key=settings.EMBEDDING_API_KEY or "dummy-key",
-            base_url=settings.EMBEDDING_API_BASE,
         )
     
     # Priority 2: OpenAI embeddings
