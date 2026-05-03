@@ -7,6 +7,12 @@ docker/.env.docker
 *.env
 venv/
 __pycache__/
+
+# Roo/Cline AI assistant files
+.roo/
+.rooignore
+.roomodes
+roo_task_*.md
 *.py[cod]
 *$py.class
 *.so
