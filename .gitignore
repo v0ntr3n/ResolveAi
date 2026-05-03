@@ -1,12 +1,11 @@
 # Python
 .venv/
 venv/
-.env
-.env.*
-docker/.env.docker
-*.env
-venv/
 __pycache__/
+
+# Environment files (keep .example files)
+.env
+docker/.env.docker
 
 # Roo/Cline AI assistant files
 .roo/
