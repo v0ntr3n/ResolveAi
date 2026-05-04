@@ -351,7 +351,11 @@ class PolicyRetriever:
         return variations
     
     def _keyword_fallback(self, query: str) -> dict[str, str]:
-        """Fallback to keyword-based retrieval."""
+        """Fallback to keyword-based retrieval with proper chunking.
+        
+        CRITICAL FIX: Returns relevant chunks, not entire files.
+        This is essential for Context Precision metric.
+        """
         lowered_query = query.lower()
         selected_file = "shipping_policy.md"
         for keyword, file_name in KEYWORD_TO_FILE.items():
@@ -360,7 +364,38 @@ class PolicyRetriever:
                 break
         
         path = Path("data/knowledge_base") / selected_file
-        return {"source": selected_file, "content": path.read_text(encoding="utf-8")}
+        full_content = path.read_text(encoding="utf-8")
+        
+        # Chunk the content properly instead of returning entire file
+        chunks = self._split_into_chunks(full_content, chunk_size=400, overlap=50)
+        
+        # Score chunks by keyword relevance
+        scored_chunks = []
+        query_keywords = set(lowered_query.split())
+        
+        for chunk in chunks:
+            chunk_lower = chunk.lower()
+            # Count keyword matches
+            score = sum(1 for kw in query_keywords if kw in chunk_lower)
+            # Also check KEYWORD_TO_FILE mappings
+            for keyword in KEYWORD_TO_FILE.keys():
+                if keyword in chunk_lower:
+                    score += 1
+            scored_chunks.append((chunk, score))
+        
+        # Sort by score and take top chunks
+        scored_chunks.sort(key=lambda x: x[1], reverse=True)
+        top_chunks = [c[0] for c in scored_chunks[:5] if c[1] > 0]
+        
+        # If no chunks matched, return first few chunks
+        if not top_chunks:
+            top_chunks = chunks[:3]
+        
+        return {
+            "source": selected_file,
+            "content": "\n\n---\n\n".join(top_chunks),
+            "chunks": top_chunks,
+        }
 
 
 # Global retriever instance

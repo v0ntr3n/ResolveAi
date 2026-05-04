@@ -316,13 +316,48 @@ def execute_address_change_node(state: SupportState) -> SupportState:
 
 @traceable(name="policy_node", run_type="chain")
 def execute_policy_node(state: SupportState) -> SupportState:
-    """Policy node with LangSmith tracing."""
+    """Policy node with LangSmith tracing.
+    
+    CRITICAL FIX: Properly extract language-specific content from bilingual files.
+    Handles various file formats:
+    - Format 1: # Title\n## English\n...\n## Vietnamese\n...
+    - Format 2: # Title\n...\n## Vietnamese\n...
+    """
     context = state["policy_context"] or {"content": "", "source": "unknown"}
     settings = get_settings()
-    sections = context["content"].split("## Vietnamese")
-    english_text = sections[0].strip()
-    vietnamese_text = sections[1].strip() if len(sections) > 1 else context["content"]
+    
+    # Properly extract language-specific sections
+    content = context["content"]
+    
+    # Try different section extraction methods
+    if "## Vietnamese" in content:
+        # Split on Vietnamese section
+        parts = content.split("## Vietnamese")
+        english_part = parts[0]
+        vietnamese_part = parts[1] if len(parts) > 1 else ""
+        
+        # Clean up English section - remove "## English" header if present
+        if "## English" in english_part:
+            english_parts = english_part.split("## English")
+            # Take content after "## English" header
+            english_text = english_parts[1].strip() if len(english_parts) > 1 else english_part.strip()
+        else:
+            english_text = english_part.strip()
+        
+        vietnamese_text = vietnamese_part.strip()
+    elif "## English" in content:
+        # Only English section
+        english_parts = content.split("## English")
+        english_text = english_parts[1].strip() if len(english_parts) > 1 else content.strip()
+        vietnamese_text = english_text  # Fallback to English
+    else:
+        # No language sections - use full content for both
+        english_text = content.strip()
+        vietnamese_text = content.strip()
+    
+    # Select appropriate language content
     selected_context = english_text if state["language"] == "en" else vietnamese_text
+    
     response = generate_policy_answer(
         question=state["message"],
         policy_context=selected_context,
