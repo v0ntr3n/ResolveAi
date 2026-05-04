@@ -32,6 +32,7 @@ DISTANCE_THRESHOLD = 0.8  # Maximum L2 distance for relevance
 RRF_K = 60  # Reciprocal Rank Fusion constant
 SEMANTIC_WEIGHT = 0.7  # Weight for semantic search in hybrid
 KEYWORD_WEIGHT = 0.3  # Weight for keyword search in hybrid
+MIN_RELEVANCE_SCORE = 0.4  # Increased from 0.3 for better precision
 
 
 KEYWORD_TO_FILE = {
@@ -437,18 +438,226 @@ class PolicyRetriever:
         # Fallback to keyword only
         return self._keyword_fallback(query)
     
+    def _detect_query_intent(self, query: str) -> str:
+        """Detect query intent to route to the most relevant policy document."""
+        lowered_query = query.lower()
+        
+        # Intent patterns with priority - more specific patterns first
+        intent_patterns = {
+            "address_change": [
+                "change my shipping address", "change address", "update address", "new address",
+                "shipping address", "delivery address", "change my address",
+                "địa chỉ", "đổi địa chỉ", "cập nhật địa chỉ"
+            ],
+            "order_status": [
+                "track my order", "where is my order", "order status", "tracking number",
+                "how do i track", "tracking info", "check my order",
+                "theo dõi đơn hàng", "trạng thái đơn hàng", "kiểm tra đơn hàng"
+            ],
+            "warranty": [
+                "warranty", "defective items", "defective item", "defect",
+                "manufacturing defect", "covered issue", "repair policy",
+                "replacement policy", "not covered",
+                "bảo hành", "lỗi nhà sản xuất", "hư hỏng do sản xuất"
+            ],
+            "cancellation": [
+                "cancel my order", "cancellation policy", "cancel order",
+                "hủy đơn hàng", "hủy đơn"
+            ],
+            "return_refund": [
+                "refund policy", "return policy", "refund", "return", "money back",
+                "hoàn tiền", "trả hàng", "chính sách hoàn tiền"
+            ],
+            "shipping": [
+                "shipping policy", "shipping", "delivery time", "how long",
+                "international shipping", "shipping take",
+                "giao hàng", "thời gian giao", "chính sách giao hàng"
+            ],
+        }
+        
+        # Check for warranty-specific patterns first (higher priority)
+        warranty_indicators = ["defective", "warranty", "manufacturing defect", "repair", "bảo hành"]
+        if any(ind in lowered_query for ind in warranty_indicators):
+            return "warranty"
+        
+        # Then check other patterns
+        for intent, patterns in intent_patterns.items():
+            for pattern in patterns:
+                if pattern in lowered_query:
+                    return intent
+        
+        return "general"
+    
+    def _get_target_file_for_intent(self, intent: str) -> str | None:
+        """Get the target file for a given intent."""
+        intent_to_file = {
+            "address_change": "address_change_policy.md",
+            "order_status": "shipping_policy.md",
+            "warranty": "warranty_policy.md",
+            "cancellation": "cancellation_policy.md",
+            "return_refund": "return_policy.md",
+            "shipping": "shipping_policy.md",
+        }
+        return intent_to_file.get(intent)
+    
     def _hybrid_search(self, query: str, k: int = 5) -> dict[str, str]:
-        """Reciprocal Rank Fusion combining semantic and keyword search."""
-        # Get semantic results
-        semantic_results = self._semantic_search(query, k=10)
+        """Reciprocal Rank Fusion combining semantic and keyword search with intent routing."""
+        # Detect query intent for better routing
+        intent = self._detect_query_intent(query)
+        target_file = self._get_target_file_for_intent(intent)
         
-        # Get keyword results
-        keyword_results = self._keyword_search(query, k=10)
-        
-        # Combine with RRF
-        combined = self._reciprocal_rank_fusion(semantic_results, keyword_results, k=k)
+        # If we have a clear intent, prioritize target file chunks
+        if target_file:
+            # Get semantic results from ALL documents
+            semantic_results = self._semantic_search(query, k=30)
+            
+            # Get keyword results from ALL documents
+            keyword_results = self._keyword_search(query, k=30)
+            
+            # Add target file chunks that might not be in top results
+            target_chunks = self._get_target_file_chunks(target_file, query)
+            
+            # Combine all results
+            combined = self._reciprocal_rank_fusion_with_target(
+                semantic_results, keyword_results, target_chunks, k=k * 2
+            )
+            
+            # Apply intent-based reranking
+            combined = self._rerank_by_intent(combined, target_file, k=k)
+        else:
+            # Standard hybrid search for general queries
+            semantic_results = self._semantic_search(query, k=20)
+            keyword_results = self._keyword_search(query, k=20)
+            combined = self._reciprocal_rank_fusion(semantic_results, keyword_results, k=k)
         
         return combined
+    
+    def _get_target_file_chunks(self, target_file: str, query: str) -> list[dict]:
+        """Get chunks from target file that match the query."""
+        results = []
+        query_terms = set(query.lower().split())
+        
+        for doc in self.documents:
+            if target_file in doc.get("source", ""):
+                content_lower = doc["content"].lower()
+                # Check if any query terms match
+                matches = sum(1 for term in query_terms if term in content_lower)
+                if matches > 0 or len(query_terms) < 3:  # Include for short queries too
+                    results.append({
+                        **doc,
+                        "keyword_score": matches + 5,  # Boost for target file
+                        "rank": 1,  # High priority
+                    })
+        
+        return results[:10]  # Limit to top 10 target chunks
+    
+    def _reciprocal_rank_fusion_with_target(
+        self, semantic_results: list[dict], keyword_results: list[dict],
+        target_chunks: list[dict], k: int = 5
+    ) -> dict[str, str]:
+        """Combine results with target file chunks prioritized."""
+        scores = defaultdict(float)
+        doc_map = {}
+        
+        # Add semantic scores
+        for doc in semantic_results:
+            doc_id = doc.get("id", f"{doc.get('source', 'unknown')}-{doc.get('chunk_id', hash(doc.get('content', '')[:100]))}")
+            scores[doc_id] += SEMANTIC_WEIGHT / (RRF_K + doc.get("rank", 1))
+            doc_map[doc_id] = doc
+        
+        # Add keyword scores
+        for doc in keyword_results:
+            doc_id = doc.get("id", f"{doc.get('source', 'unknown')}-{doc.get('chunk_id', hash(doc.get('content', '')[:100]))}")
+            scores[doc_id] += KEYWORD_WEIGHT / (RRF_K + doc.get("rank", 1))
+            if doc_id not in doc_map:
+                doc_map[doc_id] = doc
+        
+        # Add target chunks with strong boost
+        for doc in target_chunks:
+            doc_id = doc.get("id", f"{doc.get('source', 'unknown')}-{doc.get('chunk_id', hash(doc.get('content', '')[:100]))}")
+            scores[doc_id] += 1.0 / (RRF_K + 1)  # Strong boost for target
+            if doc_id not in doc_map:
+                doc_map[doc_id] = doc
+        
+        # Sort by combined score
+        ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
+        
+        # Build result with per-chunk sources
+        chunks = []
+        chunk_sources = []
+        for doc_id, score in ranked:
+            doc = doc_map[doc_id]
+            chunks.append(doc["content"])
+            chunk_sources.append(doc.get("source", "unknown"))
+        
+        sources = list(set(chunk_sources))
+        
+        return {
+            "source": ", ".join(sources),
+            "content": "\n\n---\n\n".join(chunks),
+            "chunks": chunks,
+            "chunk_sources": chunk_sources,
+            "scores": [score for _, score in ranked],
+        }
+    
+    def _rerank_by_intent(self, results: dict[str, str], target_file: str, k: int = 5) -> dict[str, str]:
+        """Rerank results to prioritize chunks from the target file."""
+        chunks = results.get("chunks", [])
+        chunk_sources = results.get("chunk_sources", [])
+        scores = results.get("scores", [])
+        
+        if not chunks:
+            return results
+        
+        # Parse chunks with their sources
+        target_chunks = []
+        other_chunks = []
+        
+        for i, chunk in enumerate(chunks):
+            # Get the source for this specific chunk
+            chunk_source = chunk_sources[i] if i < len(chunk_sources) else results.get("source", "")
+            chunk_score = scores[i] if i < len(scores) else 0.5
+            
+            # Check if this chunk is from the target file
+            is_target = target_file in chunk_source
+            
+            if is_target:
+                target_chunks.append({
+                    "chunk": chunk,
+                    "source": chunk_source,
+                    "rerank_score": chunk_score * 10.0,  # Strong boost for target
+                    "is_target": True,
+                })
+            else:
+                other_chunks.append({
+                    "chunk": chunk,
+                    "source": chunk_source,
+                    "rerank_score": chunk_score * 0.1,  # Strong penalty for non-target
+                    "is_target": False,
+                })
+        
+        # Prioritize target chunks first, then fill with other chunks if needed
+        scored_chunks = target_chunks + other_chunks
+        
+        # Sort by rerank score
+        scored_chunks.sort(key=lambda x: x["rerank_score"], reverse=True)
+        
+        # Take top k - prefer target chunks
+        top_chunks = scored_chunks[:k]
+        
+        # If we have target chunks, ensure at least some are included
+        if target_chunks and len(top_chunks) < k:
+            # Add more target chunks if available
+            remaining_target = [c for c in target_chunks if c not in top_chunks]
+            top_chunks.extend(remaining_target[:k - len(top_chunks)])
+        
+        return {
+            "source": ", ".join(set(c["source"] for c in top_chunks)),
+            "content": "\n\n---\n\n".join(c["chunk"] for c in top_chunks),
+            "chunks": [c["chunk"] for c in top_chunks],
+            "chunk_sources": [c["source"] for c in top_chunks],
+            "scores": [c["rerank_score"] for c in top_chunks],
+        }
     
     def _semantic_search(self, query: str, k: int = 10) -> list[dict]:
         """Semantic search with relevance threshold."""
@@ -476,7 +685,7 @@ class PolicyRetriever:
                         
                         # OPTIMIZATION 2: Relevance Threshold
                         # For cosine (IP), higher is better
-                        if score > 0.3:  # Minimum cosine similarity
+                        if score > MIN_RELEVANCE_SCORE:  # Minimum cosine similarity
                             results.append({
                                 **doc,
                                 "semantic_score": score,
@@ -543,17 +752,21 @@ class PolicyRetriever:
         # Sort by combined score
         ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
         
-        # Build result
+        # Build result with per-chunk sources
         chunks = []
+        chunk_sources = []
         for doc_id, score in ranked:
-            chunks.append(doc_map[doc_id]["content"])
+            doc = doc_map[doc_id]
+            chunks.append(doc["content"])
+            chunk_sources.append(doc.get("source", "unknown"))
         
-        sources = list(set(doc_map[doc_id]["source"] for doc_id, _ in ranked))
+        sources = list(set(chunk_sources))
         
         return {
             "source": ", ".join(sources),
             "content": "\n\n---\n\n".join(chunks),
             "chunks": chunks,
+            "chunk_sources": chunk_sources,  # Per-chunk sources for reranking
             "scores": [score for _, score in ranked],
         }
     
