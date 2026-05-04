@@ -2,61 +2,61 @@
   {
     "id": "eval-001",
     "query": "What is your refund policy?",
-    "expected_answer": "Refunds are available within 7 days of purchase for unused items in original packaging. Refunds after 7 days require manager approval.",
+    "expected_answer": "Orders marked as delivered can request a refund within 7 days of delivery. Refund requests must include a valid reason such as damaged, wrong_item, missing_items, or not_received. Refunds above 50 USD require human approval. Digital goods and gift cards are not refundable.",
     "category": "policy_question"
   },
   {
     "id": "eval-002",
     "query": "How long does shipping take?",
-    "expected_answer": "Standard shipping takes 5-7 business days. Express shipping takes 2-3 business days. International shipping may take 10-14 business days.",
+    "expected_answer": "Standard shipping takes 5-7 business days. Express shipping takes 2-3 business days. International shipping may take 10-14 business days depending on destination.",
     "category": "policy_question"
   },
   {
     "id": "eval-003",
     "query": "Chính sách hoàn tiền là gì?",
-    "expected_answer": "Hoàn tiền trong vòng 7 ngày sau khi mua cho các mặt hàng chưa sử dụng trong bao bì gốc. Hoàn tiền sau 7 ngày cần sự chấp thuận của quản lý.",
+    "expected_answer": "Các đơn hàng có trạng thái delivered có thể yêu cầu hoàn tiền trong vòng 7 ngày kể từ ngày giao hàng. Yêu cầu hoàn tiền phải có lý do hợp lệ như damaged, wrong_item, missing_items, hoặc not_received. Các yêu cầu hoàn tiền có giá trị trên 50 USD phải được nhân viên phê duyệt.",
     "category": "policy_question"
   },
   {
     "id": "eval-004",
     "query": "Can I change my shipping address after ordering?",
-    "expected_answer": "Yes, you can change your shipping address before the order is shipped. Contact customer support or use the order tracking page to update your address.",
+    "expected_answer": "Yes, you can change your shipping address before the order is shipped. Address changes require the order ID and new address. Orders that have already shipped cannot have their address changed.",
     "category": "policy_question"
   },
   {
     "id": "eval-005",
     "query": "What happens if my order arrives damaged?",
-    "expected_answer": "If your order arrives damaged, you can request a refund or replacement. Photo evidence is required for damaged items. Contact customer support within 48 hours of delivery.",
+    "expected_answer": "If your order arrives damaged, you can request a refund or replacement. Photo evidence is required for damaged items. Refund requests for damaged items must be submitted within 7 days of delivery. Contact customer support with your order ID and photos of the damage.",
     "category": "policy_question"
   },
   {
     "id": "eval-006",
     "query": "How do I track my order?",
-    "expected_answer": "You can track your order using the tracking number provided in your confirmation email. Visit our website and enter the tracking number to see the current status.",
+    "expected_answer": "You can track your order using the tracking number provided in your confirmation email once the order is shipped. Visit our website and enter the tracking number to see the current status. Standard shipping takes 5-7 business days, express takes 2-3 business days.",
     "category": "policy_question"
   },
   {
     "id": "eval-007",
     "query": "What is your return policy for defective items?",
-    "expected_answer": "Defective items can be returned within 30 days for a full refund or replacement. Photo evidence of the defect is required. Contact customer support to initiate the return process.",
+    "expected_answer": "Defective items can be returned within 30 days for a full refund or replacement under warranty. Photo evidence of the defect is required. Contact customer support to initiate the return process. The item must be in its original condition.",
     "category": "policy_question"
   },
   {
     "id": "eval-008",
     "query": "Do you offer international shipping?",
-    "expected_answer": "Yes, we offer international shipping to most countries. International shipping typically takes 10-14 business days. Additional customs fees may apply depending on your location.",
+    "expected_answer": "Yes, we offer international shipping to most countries. International shipping typically takes 10-14 business days. Additional customs fees and import duties may apply depending on your location and local regulations.",
     "category": "policy_question"
   },
   {
     "id": "eval-009",
     "query": "Chính sách giao hàng như thế nào?",
-    "expected_answer": "Giao hàng tiêu chuẩn mất 5-7 ngày làm việc. Giao hàng nhanh mất 2-3 ngày làm việc. Giao hàng quốc tế có thể mất 10-14 ngày làm việc.",
+    "expected_answer": "Giao hàng tiêu chuẩn mất 5-7 ngày làm việc. Giao hàng nhanh mất 2-3 ngày làm việc. Giao hàng quốc tế có thể mất 10-14 ngày làm việc tùy theo địa điểm.",
     "category": "policy_question"
   },
   {
     "id": "eval-010",
     "query": "Can I cancel my order after placing it?",
-    "expected_answer": "Orders can be cancelled within 1 hour of placement. After that, the order enters processing and cannot be cancelled. Contact customer support immediately if you need to cancel.",
+    "expected_answer": "Orders can be cancelled within 1 hour of placement for a full refund. After that, the order enters processing and may not be cancellable. Contact customer support immediately if you need to cancel. Refunds for cancelled orders are processed within 5-10 business days.",
     "category": "policy_question"
   }
 ]

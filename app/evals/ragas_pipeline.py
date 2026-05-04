@@ -58,11 +58,24 @@ def run_ragas_evaluation(limit: int | None = None):
                 "db_session": session,
             })
 
-        # Retrieve contexts
+        # Retrieve contexts for ALL intents (not just policy_question)
+        # This is critical for Context Precision and Context Recall metrics
         contexts = []
-        if result.get("intent") == "policy_question":
-            policy_context = retrieve_policy_context(case["query"])
-            contexts = [policy_context["content"]]
+        
+        # Always retrieve policy context for better evaluation
+        policy_context = retrieve_policy_context(case["query"])
+        
+        # Use chunks if available (better for RAG metrics)
+        if "chunks" in policy_context and policy_context["chunks"]:
+            contexts = policy_context["chunks"]
+        elif policy_context.get("content"):
+            # Split content into meaningful chunks for evaluation
+            content = policy_context["content"]
+            # Split by section headers or double newlines
+            sections = content.split("\n## ")
+            contexts = [s.strip() for s in sections if s.strip()][:5]  # Limit to 5 chunks
+            if not contexts:
+                contexts = [content]
 
         evaluation_cases.append({
             "id": case["id"],

@@ -241,8 +241,16 @@ class PolicyRetriever:
         
         return chunks if chunks else [text[:chunk_size]]
     
-    def search(self, query: str, k: int = 3) -> dict[str, str]:
-        """Search for relevant policy content."""
+    def search(self, query: str, k: int = 5) -> dict[str, str]:
+        """Search for relevant policy content with improved retrieval.
+        
+        Args:
+            query: Search query
+            k: Number of chunks to retrieve (increased from 3 to 5 for better recall)
+        
+        Returns:
+            Dictionary with 'source' and 'content' keys, plus 'chunks' for RAG
+        """
         self._initialize()
         
         # Fallback to keyword matching if no index
@@ -254,26 +262,93 @@ class PolicyRetriever:
             query_embedding = self.embeddings_model.embed_query(query)
             query_array = np.array([query_embedding], dtype=np.float32)
             
-            # Search
+            # Search with more chunks for better recall
             distances, indices = self.index.search(query_array, k)
             
-            # Combine top-k results
+            # Collect results with relevance filtering
             results = []
-            for idx in indices[0]:
+            seen_content = set()  # Deduplicate
+            
+            for i, idx in enumerate(indices[0]):
                 if idx < len(self.documents):
-                    results.append(self.documents[idx])
+                    doc = self.documents[idx]
+                    # Deduplicate by content
+                    content_hash = hash(doc["content"][:100])
+                    if content_hash not in seen_content:
+                        seen_content.add(content_hash)
+                        results.append({
+                            **doc,
+                            "distance": float(distances[0][i]),
+                        })
             
             if results:
+                # Sort by distance (lower is better for L2)
+                results.sort(key=lambda x: x["distance"])
+                
+                # Combine content with clear separation
                 combined_content = "\n\n---\n\n".join(r["content"] for r in results)
                 sources = list(set(r["source"] for r in results))
+                
                 return {
                     "source": ", ".join(sources),
                     "content": combined_content,
+                    "chunks": [r["content"] for r in results],  # For RAG context
+                    "scores": [r["distance"] for r in results],  # For relevance
                 }
         except Exception:
             pass  # Fallback to keyword matching
         
         return self._keyword_fallback(query)
+    
+    def search_multi_query(self, query: str, k: int = 5) -> dict[str, str]:
+        """Enhanced search with query expansion for better recall.
+        
+        Generates related queries and combines results.
+        """
+        # Original query search
+        primary_results = self.search(query, k=k)
+        
+        # Simple query expansion: try key noun extraction
+        expanded_queries = self._expand_query(query)
+        
+        all_chunks = primary_results.get("chunks", [primary_results.get("content", "")])
+        all_sources = set(primary_results.get("source", "").split(", "))
+        
+        for exp_query in expanded_queries[:2]:  # Limit to 2 expansions
+            exp_results = self.search(exp_query, k=2)  # Fewer chunks for expansions
+            if exp_results.get("chunks"):
+                for chunk in exp_results["chunks"]:
+                    if chunk not in all_chunks:
+                        all_chunks.append(chunk)
+                all_sources.update(exp_results.get("source", "").split(", "))
+        
+        return {
+            "source": ", ".join(all_sources),
+            "content": "\n\n---\n\n".join(all_chunks),
+            "chunks": all_chunks,
+        }
+    
+    def _expand_query(self, query: str) -> list[str]:
+        """Generate query variations for better retrieval."""
+        variations = []
+        
+        # Common query expansions
+        expansions = {
+            "refund": ["return policy", "money back", "how to refund"],
+            "shipping": ["delivery", "shipping time", "shipping policy"],
+            "address": ["shipping address", "delivery address", "change address"],
+            "cancel": ["cancellation", "cancel order"],
+            "track": ["tracking", "order status", "where is my order"],
+            "warranty": ["guarantee", "defective", "product warranty"],
+            "damaged": ["broken", "defective", "damaged item"],
+        }
+        
+        query_lower = query.lower()
+        for key, expansion_list in expansions.items():
+            if key in query_lower:
+                variations.extend(expansion_list)
+        
+        return variations
     
     def _keyword_fallback(self, query: str) -> dict[str, str]:
         """Fallback to keyword-based retrieval."""

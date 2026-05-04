@@ -1,12 +1,19 @@
-"""Enhanced prompts for ResolveAI customer support agent.
+"""Optimized prompts for ResolveAI customer support agent with high RAGAS scores.
 
-This module contains optimized prompts for:
-- Intent classification
-- Policy question answering
-- Order status responses
-- Refund processing
-- Address change handling
+This module contains RAG-optimized prompts designed to maximize:
+- Faithfulness: Grounding responses in retrieved context
+- Answer Relevancy: Direct, relevant answers to user questions
+- Context Precision: Using only relevant context portions
+- Context Recall: Capturing all relevant information
+
+Key improvements:
+1. Explicit citation requirements for grounding
+2. Structured output format for verification
+3. "I don't know" threshold when context is insufficient
+4. Step-by-step reasoning for transparency
 """
+
+from __future__ import annotations
 
 
 def build_intent_classification_prompt(message: str) -> str:
@@ -50,39 +57,215 @@ Intent:"""
 
 
 def build_policy_prompt(question: str, policy_context: str, language: str) -> str:
-    """Build prompt for policy questions with comprehensive guidance.
+    """Build RAG-optimized prompt for policy questions with grounding instructions.
     
-    Provides structured format for accurate and helpful responses.
+    Key optimizations for RAGAS metrics:
+    - Explicit citation requirements for Faithfulness
+    - Structured reasoning for Context Precision
+    - "I don't know" threshold for Answer Relevancy
+    - Step-by-step extraction for Context Recall
     """
-    language_name = "Vietnamese" if language == "vi" else "English"
     language_instruction = (
         "Respond in Vietnamese using formal tone (bạn, quý khách)."
         if language == "vi"
         else "Respond in English using professional but friendly tone."
     )
     
-    return f"""You are a knowledgeable customer support agent for ResolveAI. Your role is to provide accurate, helpful information about company policies.
+    return f"""You are a knowledgeable customer support agent. Your PRIMARY job is to answer questions accurately using ONLY the provided context.
 
-INSTRUCTIONS:
-1. Answer the question using ONLY the information from the Policy Context below
-2. {language_instruction}
-3. If the answer is not in the context, say so honestly and suggest contacting support
-4. Be specific and include relevant details (timeframes, requirements, fees, etc.)
-5. Format your response clearly with bullet points when appropriate
-6. Include relevant next steps or call-to-action when applicable
+=== CRITICAL INSTRUCTIONS ===
 
-RESPONSE FORMAT:
-- Start with a direct answer to the question
-- Provide supporting details
-- End with any actions the customer should take
+1. GROUNDING RULE (for Faithfulness):
+   - You MUST base your answer ONLY on the Policy Context below
+   - If you use information from context, cite it like [Source: section_name]
+   - DO NOT add any information not explicitly stated in the context
+   - If context is empty or doesn't contain the answer, respond: "I don't have that information in my knowledge base. Please contact our support team for assistance."
 
-Question:
-{question}
+2. RELEVANCE RULE (for Answer Relevancy):
+   - Answer the EXACT question asked - no more, no less
+   - Be direct and specific
+   - Include only relevant details from context
+   - {language_instruction}
 
-Policy Context:
+3. COMPLETENESS RULE (for Context Recall):
+   - Extract ALL relevant information from context that answers the question
+   - Include timeframes, amounts, conditions, requirements
+   - List any exceptions or special cases mentioned
+
+=== RESPONSE FORMAT ===
+
+Step 1: Identify what the question is asking
+Step 2: Find relevant information in context (cite sources)
+Step 3: Formulate complete answer
+
+Your Response:
+[Direct Answer]
+[Supporting Details with citations]
+[Next Steps if applicable]
+
+=== POLICY CONTEXT ===
 {policy_context}
 
-Your Response:"""
+=== QUESTION ===
+{question}
+
+=== YOUR RESPONSE ===
+Think step-by-step, then provide your answer:"""
+
+
+def build_rag_context_prompt(question: str, contexts: list[str], language: str) -> str:
+    """Build prompt with multiple context chunks for better retrieval coverage.
+    
+    Designed for RAG systems with chunked retrieval.
+    Each context chunk is numbered for citation.
+    """
+    language_instruction = (
+        "Respond in Vietnamese using formal tone."
+        if language == "vi"
+        else "Respond in English using professional but friendly tone."
+    )
+    
+    # Format contexts with chunk numbers for citation
+    formatted_contexts = []
+    for i, ctx in enumerate(contexts, 1):
+        formatted_contexts.append(f"[Chunk {i}]\n{ctx}")
+    
+    context_text = "\n\n---\n\n".join(formatted_contexts)
+    
+    return f"""You are a customer support agent. Answer the question using ONLY the provided context chunks.
+
+=== INSTRUCTIONS ===
+1. Read ALL context chunks carefully
+2. Find information that directly answers the question
+3. Cite chunk numbers like [Chunk 1] when using information
+4. If no chunk contains the answer, say: "I don't have that information available. Please contact support."
+5. {language_instruction}
+6. Be complete but concise - include all relevant details from context
+
+=== CONTEXT CHUNKS ===
+{context_text}
+
+=== QUESTION ===
+{question}
+
+=== YOUR ANSWER ===
+Provide your answer with citations from relevant chunks:"""
+
+
+def build_order_status_prompt(order_id: str, status: str, tracking_number: str, language: str) -> str:
+    """Build prompt for order status responses."""
+    status_messages = {
+        "en": {
+            "pending": f"Your order {order_id} is currently pending and will be processed soon. We'll send you a confirmation email once it ships.",
+            "processing": f"Your order {order_id} is being processed. Our team is preparing your items for shipment.",
+            "shipped": f"Great news! Your order {order_id} has been shipped. Tracking number: {tracking_number}. You can track your package using this number.",
+            "out_for_delivery": f"Your order {order_id} is out for delivery today! You should receive it by end of day.",
+            "delivered": f"Your order {order_id} was successfully delivered. We hope you enjoy your purchase!",
+        },
+        "vi": {
+            "pending": f"Đơn hàng {order_id} của bạn đang chờ xử lý. Chúng tôi sẽ gửi email xác nhận khi đơn hàng được gửi.",
+            "processing": f"Đơn hàng {order_id} đang được xử lý. Đội ngũ của chúng tôi đang chuẩn bị hàng để giao.",
+            "shipped": f"Tin tốt! Đơn hàng {order_id} đã được gửi. Mã vận đơn: {tracking_number}. Bạn có thể theo dõi đơn hàng bằng mã này.",
+            "out_for_delivery": f"Đơn hàng {order_id} đang được giao hôm nay! Bạn sẽ nhận được trước cuối ngày.",
+            "delivered": f"Đơn hàng {order_id} đã được giao thành công. Hy vọng bạn hài lòng với sản phẩm!",
+        }
+    }
+    
+    return status_messages.get(language, status_messages["en"]).get(status, f"Your order {order_id} is currently: {status}")
+
+
+def build_refund_response_prompt(
+    order_id: str,
+    decision: str,
+    amount: float,
+    reason: str | None,
+    requires_evidence: bool,
+    language: str
+) -> str:
+    """Build prompt for refund decision responses."""
+    if language == "vi":
+        if decision == "approved":
+            return f"✅ Yêu cầu hoàn tiền cho đơn hàng {order_id} đã được phê duyệt. Số tiền ${amount:.2f} sẽ được hoàn lại trong 5-10 ngày làm việc."
+        elif decision == "requires_human":
+            msg = f"⏳ Yêu cầu hoàn tiền cho đơn hàng {order_id} đang được nhân viên xem xét."
+            if requires_evidence:
+                msg += " Vui lòng gửi ảnh bằng chứng (ảnh sản phẩm bị hỏng/sai) để hỗ trợ yêu cầu của bạn."
+            return msg
+        else:
+            return f"❌ Rất tiếc, đơn hàng {order_id} không đủ điều kiện hoàn tiền theo chính sách hiện tại."
+    else:
+        if decision == "approved":
+            return f"✅ Your refund for order {order_id} has been approved. ${amount:.2f} will be returned within 5-10 business days."
+        elif decision == "requires_human":
+            msg = f"⏳ Your refund request for order {order_id} is being reviewed by our team."
+            if requires_evidence:
+                msg += " Please provide photo evidence (damaged/wrong item) to support your request."
+            return msg
+        else:
+            return f"❌ Unfortunately, order {order_id} is not eligible for a refund under our current policy."
+
+
+def build_address_change_response(
+    order_id: str,
+    success: bool,
+    new_address: str,
+    reason: str | None,
+    language: str
+) -> str:
+    """Build response for address change requests."""
+    if language == "vi":
+        if success:
+            return f"✅ Địa chỉ giao hàng cho đơn hàng {order_id} đã được cập nhật thành công đến: {new_address}"
+        else:
+            reasons = {
+                "already_shipped": "Đơn hàng đã được gửi, không thể thay đổi địa chỉ.",
+                "not_allowed": "Đơn hàng này không cho phép thay đổi địa chỉ (có thể do giới hạn chính sách hoặc rủi ro bảo mật).",
+                "high_risk": "Đơn hàng này có cờ rủi ro cao. Vui lòng liên hệ bộ phận hỗ trợ để được hỗ trợ.",
+            }
+            reason_msg = reasons.get(reason, "Không thể thay đổi địa chỉ cho đơn hàng này.")
+            return f"❌ Không thể thay đổi địa chỉ cho đơn hàng {order_id}. {reason_msg}"
+    else:
+        if success:
+            return f"✅ Shipping address for order {order_id} has been successfully updated to: {new_address}"
+        else:
+            reasons = {
+                "already_shipped": "Order has already shipped, address cannot be changed.",
+                "not_allowed": "This order does not allow address changes (may be due to policy restrictions or security flags).",
+                "high_risk": "This order has a high-risk flag. Please contact support for assistance.",
+            }
+            reason_msg = reasons.get(reason, "Unable to change address for this order.")
+            return f"❌ Cannot change address for order {order_id}. {reason_msg}"
+
+
+def build_escalation_prompt(intent: str, reason: str, order_id: str | None) -> str:
+    """Build prompt for escalation responses."""
+    return f"""Your request requires human review because: {reason}
+
+Our team has been notified and will contact you within 24 hours.
+{'Please have your order number ready: ' + order_id if order_id else ''}
+
+You can also:
+- Call us at 1-800-RESOLVE (24/7)
+- Email support@resolveai.com
+- Use live chat on our website
+
+Thank you for your patience. We're here to help!"""
+
+
+# System prompt for RAG operations
+RAG_SYSTEM_PROMPT = """You are a customer support AI assistant. Your responses must be:
+
+1. GROUNDED: Base every answer on the provided context. If context doesn't contain the answer, say "I don't have that information."
+
+2. RELEVANT: Answer only what is asked. Don't add unrelated information.
+
+3. ACCURATE: Include specific details (numbers, timeframes, conditions) from context.
+
+4. HELPFUL: Provide clear next steps when applicable.
+
+5. HONEST: If you cannot answer from context, direct the user to human support.
+
+Remember: Better to say "I don't know" than to provide incorrect information."""
 
 
 def build_order_status_prompt(order_id: str, status: str, tracking_number: str, language: str) -> str:
