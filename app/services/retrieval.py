@@ -504,13 +504,14 @@ class PolicyRetriever:
         
         # Add semantic scores
         for doc in semantic_results:
-            doc_id = doc["id"]
+            # Handle both old (no id) and new (with id) document formats
+            doc_id = doc.get("id", f"{doc.get('source', 'unknown')}-{doc.get('chunk_id', hash(doc.get('content', '')[:100]))}")
             scores[doc_id] += SEMANTIC_WEIGHT / (RRF_K + doc["rank"])
             doc_map[doc_id] = doc
         
         # Add keyword scores
         for doc in keyword_results:
-            doc_id = doc["id"]
+            doc_id = doc.get("id", f"{doc.get('source', 'unknown')}-{doc.get('chunk_id', hash(doc.get('content', '')[:100]))}")
             scores[doc_id] += KEYWORD_WEIGHT / (RRF_K + doc["rank"])
             if doc_id not in doc_map:
                 doc_map[doc_id] = doc
