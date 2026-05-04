@@ -62,7 +62,7 @@ def build_policy_prompt(question: str, policy_context: str, language: str) -> st
     Key optimizations for RAGAS metrics:
     - Explicit citation requirements for Faithfulness
     - Structured reasoning for Context Precision
-    - "I don't know" threshold for Answer Relevancy
+    - Balanced "I don't know" threshold for Answer Relevancy
     - Step-by-step extraction for Context Recall
     """
     language_instruction = (
@@ -71,37 +71,23 @@ def build_policy_prompt(question: str, policy_context: str, language: str) -> st
         else "Respond in English using professional but friendly tone."
     )
     
-    return f"""You are a knowledgeable customer support agent. Your PRIMARY job is to answer questions accurately using ONLY the provided context.
+    return f"""You are a helpful customer support agent. Answer the customer's question using the provided context.
 
-=== CRITICAL INSTRUCTIONS ===
+=== INSTRUCTIONS ===
 
-1. GROUNDING RULE (for Faithfulness):
-   - You MUST base your answer ONLY on the Policy Context below
-   - If you use information from context, cite it like [Source: section_name]
-   - DO NOT add any information not explicitly stated in the context
-   - If context is empty or doesn't contain the answer, respond: "I don't have that information in my knowledge base. Please contact our support team for assistance."
+1. ANSWER FROM CONTEXT:
+   - Use the information in the context below to answer the question
+   - If the context contains relevant information, use it to provide a complete answer
+   - Only say "I don't have that information" if the context is truly empty or completely unrelated
 
-2. RELEVANCE RULE (for Answer Relevancy):
-   - Answer the EXACT question asked - no more, no less
-   - Be direct and specific
-   - Include only relevant details from context
+2. BE HELPFUL:
+   - Provide direct, clear answers
+   - Include specific details (timeframes, amounts, conditions)
    - {language_instruction}
 
-3. COMPLETENESS RULE (for Context Recall):
-   - Extract ALL relevant information from context that answers the question
-   - Include timeframes, amounts, conditions, requirements
-   - List any exceptions or special cases mentioned
-
-=== RESPONSE FORMAT ===
-
-Step 1: Identify what the question is asking
-Step 2: Find relevant information in context (cite sources)
-Step 3: Formulate complete answer
-
-Your Response:
-[Direct Answer]
-[Supporting Details with citations]
-[Next Steps if applicable]
+3. BE HONEST:
+   - If information is missing, mention what you DO know and suggest contacting support for specifics
+   - Don't make up information not in the context
 
 === POLICY CONTEXT ===
 {policy_context}
@@ -109,8 +95,8 @@ Your Response:
 === QUESTION ===
 {question}
 
-=== YOUR RESPONSE ===
-Think step-by-step, then provide your answer:"""
+=== YOUR ANSWER ===
+Provide a helpful answer based on the context above:"""
 
 
 def build_rag_context_prompt(question: str, contexts: list[str], language: str) -> str:
