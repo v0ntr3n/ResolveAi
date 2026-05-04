@@ -243,7 +243,20 @@ class PolicyRetriever:
         
         # Create embeddings with caching
         embeddings = self._get_cached_embeddings([doc["content"] for doc in documents])
+        
+        # Validate embeddings
+        if not embeddings or not embeddings[0]:
+            return
+        
         embeddings_array = np.array(embeddings, dtype=np.float32)
+        
+        # Ensure 2D array
+        if embeddings_array.ndim == 1:
+            embeddings_array = embeddings_array.reshape(1, -1)
+        
+        # Validate shape
+        if len(embeddings_array.shape) != 2:
+            return
         
         # OPTIMIZATION 3: Normalize for cosine similarity
         faiss.normalize_L2(embeddings_array)
@@ -268,7 +281,11 @@ class PolicyRetriever:
         for i, text in enumerate(texts):
             cached = self._embedding_cache.get(text)
             if cached is not None:
-                embeddings.append(cached.tolist())
+                # Ensure cached embedding is a list
+                if isinstance(cached, np.ndarray):
+                    embeddings.append(cached.tolist())
+                else:
+                    embeddings.append(list(cached) if cached else [])
             else:
                 embeddings.append(None)  # Placeholder
                 uncached_texts.append(text)
@@ -280,8 +297,15 @@ class PolicyRetriever:
             
             # Update cache and fill placeholders
             for idx, text, emb in zip(uncached_indices, uncached_texts, new_embeddings):
-                embeddings[idx] = emb
-                self._embedding_cache.set(text, np.array(emb, dtype=np.float32))
+                # Ensure embedding is a flat list
+                if isinstance(emb, list):
+                    embeddings[idx] = emb
+                else:
+                    embeddings[idx] = list(emb)
+                self._embedding_cache.set(text, np.array(embeddings[idx], dtype=np.float32))
+        
+        # Filter out empty embeddings
+        embeddings = [e for e in embeddings if e and len(e) > 0]
         
         return embeddings
     
