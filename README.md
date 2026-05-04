@@ -5,6 +5,7 @@ ResolveAI is a bilingual autonomous Tier-1 support system built with LangGraph, 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [RAGAS Evaluation Metrics](#ragas-evaluation-metrics)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Environment Configuration](#environment-configuration)
@@ -48,6 +49,35 @@ ResolveAI demonstrates a production-ready RAG (Retrieval-Augmented Generation) s
 
 - **English**: Full support for all operations
 - **Vietnamese**: Full support for all operations
+
+### RAGAS Evaluation Metrics
+
+ResolveAI uses RAGAS (Retrieval Augmented Generation Assessment) to evaluate the quality of RAG responses. The evaluation measures four key metrics:
+
+| Metric | Description | Current Score |
+|--------|-------------|---------------|
+| **Overall Score** | Combined score across all metrics | 0.659 |
+| **Faithfulness** | How well the answer is grounded in retrieved context | 0.773 |
+| **Answer Relevancy** | How relevant the answer is to the question | 0.788 |
+| **Context Precision** | How relevant the retrieved context is | 0.350 |
+| **Context Recall** | How well the context covers the expected answer | 0.725 |
+
+#### Recent Improvements
+
+The RAG system has been optimized with the following enhancements:
+
+- **Intent-Based Document Routing**: Query intent detection for better document retrieval
+- **Reranking Implementation**: Prioritizes relevant chunks from target policy files
+- **Higher Relevance Threshold**: Increased from 0.3 to 0.4 for better precision
+- **Per-Chunk Source Tracking**: Accurate source attribution for reranking
+
+To run the RAGAS evaluation:
+
+```bash
+uv run python -m app.evals.ragas_pipeline
+```
+
+Evaluation reports are saved to `data/evals/ragas_report.json`.
 
 ---
 
