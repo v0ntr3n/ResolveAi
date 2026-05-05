@@ -23,15 +23,25 @@ def test_prometheus_metrics_endpoint():
     assert "resolveai_request_latency_seconds" in response.text
 
 
-def test_tracing_configuration():
+def test_tracing_configuration(monkeypatch):
     """Test LangSmith tracing configuration."""
+    # Mock settings to return empty API key
+    from app.core.config import Settings
+    mock_settings = Settings(LANGSMITH_API_KEY="")
+    monkeypatch.setattr("app.core.tracing.get_settings", lambda: mock_settings)
+    
     # Should not raise errors even without API key
     client = configure_tracing()
     assert client is None  # No API key configured in tests
 
 
-def test_trace_url_generation():
+def test_trace_url_generation(monkeypatch):
     """Test trace URL generation."""
+    # Mock settings to return empty API key and org
+    from app.core.config import Settings
+    mock_settings = Settings(LANGSMITH_API_KEY="", LANGSMITH_ORG="")
+    monkeypatch.setattr("app.core.tracing.get_settings", lambda: mock_settings)
+    
     url = get_trace_url("test-run-id")
     # Should return empty string without proper configuration
     assert url == ""
@@ -67,27 +77,22 @@ def test_health_endpoint_with_tracing():
     assert response.json() == {"status": "ok"}
 
 
-def test_ragas_evaluator_initialization():
+def test_ragas_evaluator_initialization(monkeypatch):
     """Test RAGAS evaluator can be initialized with proper error handling."""
-    import os
     from app.evals.ragas_eval import RAGASEvaluator
+    from app.core.config import Settings
     
-    # Temporarily unset OPENAI_API_KEY to test error handling
-    original_key = os.environ.get("OPENAI_API_KEY", "")
-    os.environ["OPENAI_API_KEY"] = ""
+    # Mock settings to return empty API keys
+    mock_settings = Settings(
+        OPENAI_API_KEY="",
+        DEEPSEEK_API_KEY="",
+        EMBEDDING_API_BASE="",
+    )
+    monkeypatch.setattr("app.evals.ragas_eval.get_settings", lambda: mock_settings)
     
-    # Clear the settings cache to pick up new environment
-    from app.core.config import get_settings
-    get_settings.cache_clear()
-    
-    try:
-        # Should raise ValueError without OpenAI API key
-        with pytest.raises(ValueError, match="OPENAI_API_KEY required"):
-            RAGASEvaluator()
-    finally:
-        # Restore original key
-        os.environ["OPENAI_API_KEY"] = original_key
-        get_settings.cache_clear()
+    # Should raise ValueError without any LLM API key
+    with pytest.raises(ValueError, match="Either DEEPSEEK_API_KEY or OPENAI_API_KEY required"):
+        RAGASEvaluator()
 
 
 def test_ragas_test_cases_exist():

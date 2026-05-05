@@ -23,16 +23,19 @@ services:
         value: "50.0"
 
   - type: web
-    name: resolveai-ui
-    runtime: python
+    name: resolveai-frontend
+    runtime: node
     plan: free
     region: singapore
-    buildCommand: uv sync --frozen --no-dev
-    startCommand: uv run streamlit run ui/app.py --server.address 0.0.0.0 --server.port $PORT
+    buildCommand: cd ui-nextjs && npm install && npm run build
+    startCommand: cd ui-nextjs && npm start
     autoDeployTrigger: commit
     envVars:
-      - key: RESOLVEAI_BACKEND_HOSTPORT
+      - key: NEXT_PUBLIC_API_URL
         fromService:
           name: resolveai-api
           type: web
           property: hostport
+        generateValue: true
+      - key: NODE_ENV
+        value: production

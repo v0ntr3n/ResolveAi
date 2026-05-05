@@ -17,10 +17,10 @@ This document provides Docker-only deployment strategies for ResolveAI, replacin
 │       ├─────────────────────┬──────────────────┐                │
 │       ▼                     ▼                  ▼                │
 │  ┌──────────┐        ┌──────────┐      ┌──────────┐            │
-│  │ Backend  │        │   UI     │      │Prometheus│            │
-│  │ API      │        │Streamlit │      │Monitoring│            │
+│  │ Backend  │        │Frontend  │      │Prometheus│            │
+│  │ API      │        │ Next.js  │      │Monitoring│            │
 │  │ (3 replicas)│      │          │      │          │            │
-│  │ Port 10000│      │Port 8501│      │Port 9090│            │
+│  │ Port 10000│      │Port 3000│      │Port 9090│            │
 │  └──────────┘        └──────────┘      └──────────┘            │
 │       │                                                           │
 │       ▼                                                           │
@@ -92,21 +92,22 @@ networks:
 
 ---
 
-### 2. Streamlit UI Service
+### 2. Next.js Frontend Service
 
-**File: `docker/docker-compose.yml` (UI section)**
+**File: `docker/docker-compose.yml` (Frontend section)**
 
 ```yaml
-  ui:
+  frontend:
     build:
       context: ..
-      dockerfile: Dockerfile.ui
-    container_name: resolveai-ui
+      dockerfile: Dockerfile.nextjs
+    container_name: resolveai-frontend
     restart: unless-stopped
     ports:
-      - "8501:8501"
+      - "3000:3000"
     environment:
-      - RESOLVEAI_BACKEND_URL=http://backend:10000
+      - NEXT_PUBLIC_API_URL=http://backend:10000
+      - NODE_ENV=production
     depends_on:
       backend:
         condition: service_healthy
@@ -130,8 +131,8 @@ http {
         server backend:10000;
     }
     
-    upstream ui {
-        server ui:8501;
+    upstream frontend {
+        server frontend:3000;
     }
     
     server {
@@ -147,10 +148,10 @@ http {
     
     server {
         listen 80;
-        server_name ui.resolveai.local;
+        server_name resolveai.local;
         
         location / {
-            proxy_pass http://ui;
+            proxy_pass http://frontend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_http_version 1.1;
@@ -370,39 +371,33 @@ COMPOSE_PROJECT_NAME=resolveai
 
 **File: `Dockerfile`** (already exists in project)
 
-### UI Dockerfile
+### Frontend Dockerfile
 
-**File: `Dockerfile.ui`**
+**File: `Dockerfile.nextjs`** (already exists in project)
+
+The Next.js frontend uses a multi-stage build for optimized production images:
 
 ```dockerfile
-# ResolveAI UI - Dockerfile for Streamlit
-FROM python:3.12-slim
-
-WORKDIR /app
-
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
-
-# Copy dependency files
-COPY pyproject.toml uv.lock ./
-
+# Stage 1: Dependencies
+FROM node:20-alpine AS deps
 # Install dependencies
-RUN uv sync --frozen --no-dev --no-editable
 
-# Copy application code
-COPY ui/ ./ui/
-COPY app/ ./app/
+# Stage 2: Builder
+FROM node:20-alpine AS builder
+# Build the Next.js application
 
-# Set environment variables
-ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONPATH=/app
-
-# Expose port
-EXPOSE 8501
-
-# Run Streamlit
-CMD ["streamlit", "run", "ui/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Stage 3: Runner (Production)
+FROM node:20-alpine AS runner
+# Production runtime with standalone output
+EXPOSE 3000
+CMD ["node", "server.js"]
 ```
+
+Key features:
+- Multi-stage build for smaller images
+- Standalone output for optimal performance
+- Health check endpoint at `/api/health`
+- Non-root user for security
 
 ---
 

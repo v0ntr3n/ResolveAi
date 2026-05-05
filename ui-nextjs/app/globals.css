@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom selection color */
+  ::selection {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #18181b;
+  }
+
+  /* Focus ring */
+  *:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* Bento Card */
+  .bento-card {
+    @apply relative overflow-hidden rounded-2xl border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-6 transition-all duration-200;
+  }
+
+  .bento-card:hover {
+    @apply -translate-y-0.5 border-base-300 dark:border-base-700 shadow-lg dark:shadow-none;
+  }
+
+  .bento-card::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-0.5 bg-accent scale-x-0 transition-transform duration-200;
+  }
+
+  .bento-card:hover::before {
+    @apply scale-x-100;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide;
+  }
+
+  /* Quick Action Button */
+  .quick-action-btn {
+    @apply relative overflow-hidden rounded-lg border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4 text-left transition-all duration-300;
+  }
+
+  .quick-action-btn:hover {
+    @apply border-accent;
+  }
+  
+  /* Ensure text remains visible during hover */
+  .quick-action-btn * {
+    @apply transition-colors duration-300;
+  }
+
+  /* Chat Message CSS removed, handled inline */
+
+  /* Empty State */
+  .empty-state {
+    @apply rounded-xl border-2 border-dashed border-base-300 dark:border-base-700 bg-base-50 dark:bg-base-800/50 p-8 text-center;
+  }
+
+  /* Escalation Card */
+  .escalation-card {
+    @apply rounded-lg border border-red-200 dark:border-red-900/50 border-l-4 border-l-red-500 bg-red-50 dark:bg-red-950/20 p-5;
+  }
+
+  /* Info Card */
+  .info-card {
+    @apply rounded-xl border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-6 shadow-sm dark:shadow-none;
+  }
+
+  /* Metric Value */
+  .metric-value {
+    @apply text-4xl font-bold tracking-tight leading-none dark:text-base-50;
+  }
+
+  .metric-label {
+    @apply text-sm font-medium uppercase tracking-wider text-base-500 dark:text-base-400;
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply animate-shimmer rounded-md bg-gradient-to-r from-base-100 via-base-200 to-base-100;
+    background-size: 200% 100%;
+  }
+}
+
+@layer utilities {
+  /* Premium transition */
+  .transition-premium {
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Text gradient (use sparingly) */
+  .text-gradient-accent {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #a3e635 0%, #65a30d 100%);
+  }
+
+  /* Diffused shadow */
+  .shadow-diffused {
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Inner border for glassmorphism */
+  .inner-border {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}

@@ -2,6 +2,30 @@
 .venv/
 venv/
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Backup files
+*.backup
+*.old
+*.bak
 
 # Environment files (keep .example files)
 .env
@@ -108,3 +132,6 @@ resolveai.egg-info/
 123/
 tmp/
 temp/
+node_modules/
+.next/
+data/embedding_cache/

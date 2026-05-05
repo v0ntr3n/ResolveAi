@@ -12,10 +12,13 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 WORKDIR /app
 
 # Copy dependency files
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock* ./
+
+# Create virtual environment using the container's Python
+RUN uv venv --python /usr/local/bin/python3.12 /app/.venv
 
 # Install dependencies (production only)
-RUN uv sync --frozen --no-dev --no-editable
+RUN . /app/.venv/bin/activate && uv sync --frozen --no-dev
 
 # ============================================
 # Stage 2: Production Runtime
@@ -42,7 +45,8 @@ COPY --chown=resolveai:resolveai . .
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    VIRTUAL_ENV=/app/.venv
 
 # Create data directories
 RUN mkdir -p /app/data/vector_index && \
@@ -59,4 +63,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:10000/health || exit 1
 
 # Run application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "2"]

@@ -10,7 +10,7 @@ This document provides a comprehensive overview of the ResolveAI system architec
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────┐
-│   Streamlit UI  │  ← Bilingual Chat Interface (English/Vietnamese)
+│   Next.js UI    │  ← Bilingual Chat Interface (English/Vietnamese)
 │   (Frontend)    │
 └────────┬────────┘
          │ HTTP/WebSocket
@@ -67,9 +67,9 @@ This document provides a comprehensive overview of the ResolveAI system architec
 
 ## Component Details
 
-### 1. Frontend Layer (Streamlit)
+### 1. Frontend Layer (Next.js)
 
-**File:** `ui/app.py`
+**Directory:** `ui-nextjs/`
 
 ```
 Responsibilities:
@@ -82,6 +82,8 @@ Key Features:
 - Language detection (English/Vietnamese)
 - Decision transparency (intent, confidence, tool used)
 - Session state management
+- Modern React with Framer Motion animations
+- Responsive design with Tailwind CSS
 ```
 
 ### 2. API Layer (FastAPI)
@@ -318,8 +320,8 @@ LLM Operations:
 │                                                              │
 │  ┌──────────────────────┐      ┌──────────────────────┐     │
 │  │   resolveai-api      │      │   resolveai-ui       │     │
-│  │   (FastAPI)          │      │   (Streamlit)        │     │
-│  │   Port: 8000         │◀────▶│   Port: 8501         │     │
+│  │   (FastAPI)          │      │   (Next.js)          │     │
+│  │   Port: 8000         │◀────▶│   Port: 3000         │     │
 │  │   Region: Singapore  │      │   Region: Singapore  │     │
 │  └──────────┬───────────┘      └──────────────────────┘     │
 │             │                                                │

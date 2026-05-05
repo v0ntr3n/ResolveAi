@@ -2,6 +2,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -29,10 +30,32 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     if settings.AUTO_SEED_DATA:
         with Session(engine) as session:
             seed_orders(session)
+            # Also seed demo orders
+            from app.data.seed_demo import seed_demo_orders
+            seed_demo_orders(session)
     yield
 
 
 app = FastAPI(title="ResolveAI", lifespan=lifespan)
+
+# Setup CORS middleware for frontend integration
+settings = get_settings()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "X-Correlation-ID",
+        "X-Request-ID",
+    ],
+    expose_headers=[
+        "X-Correlation-ID",
+        "X-RateLimit-Remaining",
+    ],
+)
 
 # Setup Prometheus metrics middleware
 from app.middleware.prometheus import PrometheusMiddleware

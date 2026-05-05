@@ -1,13 +1,12 @@
 [project]
 name = "resolveai"
 version = "0.1.0"
-description = "Autonomous Tier-1 support agent with LangGraph, FastAPI, and Streamlit."
+description = "Autonomous Tier-1 support agent with LangGraph and FastAPI."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.115.0,<1.0.0",
     "uvicorn>=0.35.0,<1.0.0",
-    "streamlit>=1.45.0,<2.0.0",
     "sqlalchemy>=2.0.40,<3.0.0",
     "pydantic>=2.11.0,<3.0.0",
     "pydantic-settings>=2.9.0,<3.0.0",
@@ -45,7 +44,7 @@ pythonpath = ["."]
 asyncio_mode = "auto"
 
 [tool.setuptools]
-packages = ["app", "ui"]
+packages = ["app"]
 
 [tool.ruff]
 line-length = 100

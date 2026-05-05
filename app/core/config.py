@@ -30,6 +30,15 @@ class Settings(BaseSettings):
     # Week 3: Prometheus metrics
     PROMETHEUS_ENABLED: bool = True
     METRICS_PORT: int = 9090
+    
+    # CORS settings for frontend integration
+    CORS_ORIGINS: str = "http://localhost:3000"
+    CORS_ALLOW_CREDENTIALS: bool = True
+    
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Parse CORS origins from comma-separated string."""
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
 
 @lru_cache

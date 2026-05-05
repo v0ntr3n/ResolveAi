@@ -1,0 +1,3 @@
+# ResolveAI Customer Support
+User-agent: *
+Allow: /

@@ -8,7 +8,7 @@ from app.core.exceptions import ValidationError
 
 
 # Patterns
-ORDER_ID_PATTERN = re.compile(r"^ORD-\d{6}$", re.IGNORECASE)
+ORDER_ID_PATTERN = re.compile(r"^(ORD-\d{6}|DEMO-\d{3})$", re.IGNORECASE)
 EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 TRACKING_PATTERN = re.compile(r"^[A-Z0-9]{8,20}$", re.IGNORECASE)
 
@@ -25,9 +25,9 @@ def validate_order_id(order_id: str | None) -> str:
     
     if not ORDER_ID_PATTERN.match(order_id):
         raise ValidationError(
-            "Order ID must be in format ORD-XXXXXX (e.g., ORD-000123)",
+            "Order ID must be in format ORD-XXXXXX (e.g., ORD-000123) or DEMO-XXX (e.g., DEMO-001)",
             field="order_id",
-            details={"provided": order_id, "expected_format": "ORD-XXXXXX"},
+            details={"provided": order_id, "expected_format": "ORD-XXXXXX or DEMO-XXX"},
         )
     
     return order_id

@@ -20,6 +20,66 @@ ResolveAI is a bilingual autonomous Tier-1 support system built with LangGraph, 
 
 ---
 
+## 🚀 Quick Start Demo
+
+Get ResolveAI running in under 5 minutes!
+
+### 1. Install & Run
+
+```bash
+# Clone and install
+git clone https://github.com/yourusername/resolveai.git
+cd resolveai
+uv sync
+
+# Copy environment file
+cp .env.example .env
+
+# Start backend (terminal 1)
+uv run uvicorn app.main:app --reload --port 10000
+
+# Start Next.js UI (terminal 2)
+cd ui-nextjs && npm install && npm run dev
+```
+
+### 2. Try Demo Queries
+
+Open the UI at http://localhost:3000 and try these queries:
+
+| Query | Expected Response |
+|-------|-------------------|
+| `Where is my order DEMO-001?` | Order status: delivered |
+| `I want a refund for order DEMO-002` | Requests photo evidence |
+| `Change address for DEMO-003 to 123 New St` | Address updated successfully |
+| `What is your return policy?` | Policy from knowledge base |
+| `Tôi muốn đổi địa chỉ cho DEMO-012` | Vietnamese address change |
+
+### 3. Demo Screenshots
+
+#### Dashboard & Chat Interface
+![ResolveAI Dashboard Light](images/demo_dashboard_light.png)
+![ResolveAI Dashboard Dark](images/demo_dashboard_dark.png)
+
+The modern Next.js UI features:
+- **Bento Grid Layout**: Asymmetric dashboard with smooth animations
+- **Real-time Chat**: Interactive chat with typing indicators
+- **Demo Orders Panel**: Quick access to test scenarios
+- **Quick Actions**: One-click buttons for common tasks
+
+### Demo Order Scenarios
+
+The system includes 15 pre-configured demo orders for testing:
+
+| Order ID | Scenario | Test With |
+|----------|----------|-----------|
+| DEMO-001 | Standard delivered order | `"Where is order DEMO-001?"` |
+| DEMO-002 | Damaged item, needs evidence | `"Refund DEMO-002, it's damaged"` |
+| DEMO-003 | Pending, address change allowed | `"Change address for DEMO-003"` |
+| DEMO-008 | High value (>$120) | `"I want a refund for DEMO-008"` |
+| DEMO-012 | Vietnamese customer | `"Đổi địa chỉ cho DEMO-012"` |
+
+---
+
 ## Project Overview
 
 ### Purpose
@@ -266,18 +326,18 @@ The database contains three main tables:
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 10000
 ```
 
-#### Start Streamlit UI
+#### Start Next.js UI
 
 ```bash
 # In a separate terminal
-uv run streamlit run ui/app.py
+cd ui-nextjs && npm install && npm run dev
 ```
 
 #### Access the Application
 
 - **API**: http://localhost:10000
 - **API Documentation**: http://localhost:10000/docs
-- **Streamlit UI**: http://localhost:8501
+- **Next.js UI**: http://localhost:3000
 
 ### Production Mode
 
@@ -456,8 +516,10 @@ resolveai/
 │       ├── runner.py             # Eval runner
 │       ├── ragas_eval.py         # RAGAS metrics
 │       └── ragas_pipeline.py     # Eval pipeline
-├── ui/                           # Streamlit frontend
-│   └── app.py                    # UI application
+├── ui-nextjs/                    # Next.js frontend
+│   ├── app/                      # Next.js app directory
+│   ├── components/               # React components
+│   └── public/                   # Static assets
 ├── data/                         # Data files
 │   ├── knowledge_base/           # Policy documents
 │   └── evals/                    # Evaluation data
@@ -477,7 +539,7 @@ resolveai/
 ├── pyproject.toml                # Project configuration
 ├── requirements.txt              # Dependencies
 ├── Dockerfile                    # Backend container
-├── Dockerfile.ui                 # UI container
+├── Dockerfile.nextjs             # Next.js container
 └── README.md                     # This file
 ```
 

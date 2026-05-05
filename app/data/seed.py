@@ -52,7 +52,8 @@ def _build_order(fake: Faker, rng: random.Random, index: int) -> Order:
 
 
 def seed_orders(session: Session, total_orders: int = 1000, seed: int = 42) -> None:
-    existing_order = session.scalar(select(Order.id).limit(1))
+    # Check if ORD-* orders already exist
+    existing_order = session.scalar(select(Order.id).where(Order.order_id.like("ORD-%")).limit(1))
     if existing_order is not None:
         return
 

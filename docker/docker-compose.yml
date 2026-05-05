@@ -17,6 +17,7 @@ services:
       - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-resolveai-production}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - PROMETHEUS_ENABLED=true
+      - UVICORN_WORKERS=${UVICORN_WORKERS:-2}
     volumes:
       - backend-data:/app/data
       - ./logs:/app/logs
@@ -37,24 +38,39 @@ services:
     networks:
       - resolveai-network
 
-  # Streamlit UI Service
-  ui:
+  # Next.js Frontend Service
+  frontend:
     build:
       context: ..
-      dockerfile: Dockerfile.ui
-    container_name: resolveai-ui
+      dockerfile: Dockerfile.nextjs
+    container_name: resolveai-frontend
     restart: unless-stopped
     ports:
-      - "8501:8501"
+      - "3000:3000"
     environment:
-      - RESOLVEAI_BACKEND_URL=http://backend:10000
+      - NEXT_PUBLIC_API_URL=http://backend:10000
+      - NODE_ENV=production
     depends_on:
       backend:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
     networks:
       - resolveai-network
 
-volumes:
+ volumes:
   backend-data:
     driver: local
 
