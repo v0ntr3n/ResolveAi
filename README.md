@@ -1,6 +1,8 @@
 # ResolveAI
 
-ResolveAI is a bilingual autonomous Tier-1 support system built with LangGraph, FastAPI, and Streamlit. It provides intelligent customer support for order status inquiries, refund requests, address changes, and policy questions in both English and Vietnamese.
+<img src="ui-nextjs/public/favicon.svg" alt="ResolveAI Logo" width="60" height="60" align="right">
+
+ResolveAI is a bilingual autonomous Tier-1 support system built with LangGraph, FastAPI, and Next.js. It provides intelligent customer support for order status inquiries, refund requests, address changes, and policy questions in both English and Vietnamese.
 
 ## Table of Contents
 
@@ -59,6 +61,9 @@ Open the UI at http://localhost:3000 and try these queries:
 #### Dashboard & Chat Interface
 ![ResolveAI Dashboard Light](images/demo_dashboard_light.png)
 ![ResolveAI Dashboard Dark](images/demo_dashboard_dark.png)
+
+#### Live Demo
+![ResolveAI Demo](images/demo.gif)
 
 The modern Next.js UI features:
 - **Bento Grid Layout**: Asymmetric dashboard with smooth animations
